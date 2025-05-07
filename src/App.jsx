@@ -234,7 +234,7 @@ export default function App() {
           </p>
           <p className="mt-4">
             🌐 Live Dashboard:{' '}
-            <a href="https://smartairproject.grafana.net" className="text-blue-600 hover:underline" target="_blank">
+            <a href="https://smartairproject.grafana.net/d/smart-air-mariadb/smart-air-monitoring-dashboard?orgId=1&from=2025-04-30T14:20:36.000Z&to=2025-04-30T14:22:52.000Z&timezone=browser&refresh=5s" className="text-blue-600 hover:underline" target="_blank">
               smartairproject.grafana.net
             </a>
           </p>
