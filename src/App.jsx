@@ -11,7 +11,7 @@ export default function App() {
 
           <div className="flex items-center justify-center mt-4 space-x-4">
             <img
-              src="/fh-logo.png"
+              src="src/assets/fh-logo.png" 
               alt="FH Oberösterreich Logo"
               className="h-10 w-auto"
             />
