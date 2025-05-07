@@ -3,7 +3,7 @@
 export default function App() {
   return (
     <>
-      <main className="bg-white text-gray-900 min-h-screen container mx-auto px-4 py-8">
+      <main className="text-gray-900 min-h-screen container mx-auto px-4 py-8">
         {/* Title section */}
         <header className="text-center mb-12">
 
