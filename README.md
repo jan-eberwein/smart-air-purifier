@@ -1,5 +1,5 @@
 # 🌬️ Smart Air Web Documentation 
-// How-To Tutorial to rebuild the system.
+How-To Tutorial to rebuild the system
 
 ## 🚀 Tech Stack
 - 🛠️ **Vite**
@@ -21,3 +21,6 @@
 ## Automatic deployment
 Github Repo gets automatically deployed to live vercel app.
 https://smart-air-purifier.vercel.app/
+
+
+© 2025 FH Hagenberg. Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard Schnaitl
