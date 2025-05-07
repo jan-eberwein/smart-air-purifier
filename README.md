@@ -1,4 +1,5 @@
-# 🌬️ Smart Air Web Documentation / How-To Tutorial to rebuild the system.
+# 🌬️ Smart Air Web Documentation 
+// How-To Tutorial to rebuild the system.
 
 ## 🚀 Tech Stack
 - 🛠️ **Vite**
@@ -13,9 +14,9 @@
    git clone https://github.com/your-org/smart-air-web.git
    cd smart-air-web
    npm install
+   npm run dev
    ```
-http://localhost:5173   
-
+   http://localhost:5173   
 
 ## Automatic deployment
 Github Repo gets automatically deployed to live vercel app.
