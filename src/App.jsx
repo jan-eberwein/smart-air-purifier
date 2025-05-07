@@ -5,7 +5,7 @@ export default function App() {
     <>
       <main className="text-gray-900 min-h-screen container mx-auto px-4 py-8">
         {/* Title section */}
-        <header className="text-center mb-12">
+        <header className="text-center mb-12 ">
 
           <h1 className="text-2xl font-semibold">Smart Air Purifier 💨</h1>
 
@@ -20,9 +20,10 @@ export default function App() {
             </p>
           </div>
           <p className="mt-4">
-            Team: Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard Schnaitl
+            Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard Schnaitl
           </p>
         </header>
+        
 
 
         {/* Table of Contents */}
@@ -189,12 +190,97 @@ export default function App() {
           </p>
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-arduino">{`
-              /* fanControl.ino */
-              // Setup PWM on GPIO13 using analogWrite
-              // void loop() {
-              //   analogWrite(13, duty);
-              // }
-            `}</code>
+// -----------------------------
+// PIN CONFIGURATION
+// -----------------------------
+const int fanPwmPin = 13;   // GPIO13 → PWM output via transistor
+const int tachPin    = 12;  // GPIO12 → tachometer input
+
+// -----------------------------
+// RPM MEASUREMENT
+// -----------------------------
+volatile int pulseCount    = 0;
+volatile unsigned long lastPulse = 0;
+
+void IRAM_ATTR countPulse() {
+  unsigned long now = micros();
+  if (now - lastPulse > 1000) {   // 1 ms debounce
+    pulseCount++;
+    lastPulse = now;
+  }
+}
+
+// -----------------------------
+// Calibration Tables and Constants
+// -----------------------------
+const int   N = 11;
+const float rpmTable[N]  = {   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 };
+const int   dutyTable[N] = { 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 };
+const float maxRpm = 14520.0;    // reference maximum RPM
+
+// runtime variables
+int currentPercent = 0;
+unsigned long lastRpmTime = 0;
+
+// -----------------------------
+// Interpolation Function for Duty
+// -----------------------------
+int getInterpolatedDuty(int percent) {
+  float desiredRpm = percent / 100.0 * maxRpm;
+
+  if (desiredRpm <= rpmTable[0]) return dutyTable[0];
+  if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
+
+  for (int i = 0; i < N - 1; i++) {
+    if (desiredRpm <= rpmTable[i+1]) {
+      float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
+      float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
+      return int(d + 0.5);
+    }
+  }
+  return dutyTable[N-1];
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+
+  pinMode(fanPwmPin, OUTPUT);
+  analogWrite(fanPwmPin, 255);   // start at full speed (0% input)
+
+  pinMode(tachPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
+
+  Serial.println();
+  Serial.println("Enter a value 0–100 in the Serial Monitor and press Enter:");
+}
+
+void loop() {
+  if (Serial.available()) {
+    int p = Serial.parseInt();
+    if (p >= 0 && p <= 100) {
+      currentPercent = p;
+      int duty = getInterpolatedDuty(currentPercent);
+      analogWrite(fanPwmPin, duty);
+      Serial.printf("→ Fan set to %3d%% (Duty=%d)\n", currentPercent, duty);
+    } else {
+      Serial.println("Invalid! Please enter 0–100.");
+    }
+    while (Serial.available()) Serial.read();
+  }
+
+  if (millis() - lastRpmTime >= 1000) {
+    lastRpmTime = millis();
+    noInterrupts();
+    int count = pulseCount;
+    pulseCount = 0;
+    interrupts();
+
+    float rpm = (count / 2.0) * 60.0;  // 2 pulses per rev
+    Serial.printf("Current RPM at %3d%%: %.0f\n", currentPercent, rpm);
+  }
+}
+`}</code>
           </pre>
         </section>
       </main>
