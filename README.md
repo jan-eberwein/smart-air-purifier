@@ -11,7 +11,7 @@ How-To Tutorial to rebuild the system
 
 1. **Clone & install**  
    ```bash
-   git clone https://github.com/your-org/smart-air-web.git
+   git clone https://github.com/jan-eberwein/smart-air-purifier.git
    cd smart-air-web
    npm install
    npm run dev
