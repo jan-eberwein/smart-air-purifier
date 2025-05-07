@@ -47,10 +47,10 @@ export default function App() {
             part of the Pervasive Computing course at FH Hagenberg. Each team member contributed key components:
           </p>
           <ul className="list-disc list-inside mt-4 space-y-2">
-            <li><strong>Jan Eberwein:</strong> Enclosure and fan-filter assembly</li>
-            <li><strong>Leonhard Schnaitl:</strong> Air quality sensors</li>
-            <li><strong>Lisa Reichl:</strong> Holographic display</li>
-            <li><strong>Florian Guggenberger &amp; Rawan Gomaa:</strong> Data transfer, storage, and dashboard</li>
+            <li><strong>Jan Eberwein:</strong> HEPA Filter Enclosure, Fan-Filter assembly and Fan control</li>
+            <li><strong>Leonhard Schnaitl:</strong> Air Quality Sensors & LoRaWAN Data Transfer</li>
+            <li><strong>Lisa Reichl:</strong> Holographic display + LoRaWAN Data Transfer</li>
+            <li><strong>Florian Guggenberger &amp; Rawan Gomaa:</strong> Grafana Dashboard and DB storage</li>
           </ul>
         </section>
 
