@@ -35,6 +35,7 @@ export default function App() {
             <li><a href="#assembly" className="text-blue-600 hover:underline">Assembly & Wiring</a></li>
             <li><a href="#sensors" className="text-blue-600 hover:underline">Sensors & LoRaWAN</a></li>
             <li><a href="#display" className="text-blue-600 hover:underline">Holographic Display</a></li>
+            <li><a href="#raspberry" className="text-blue-600 hover:underline">Raspberry Pi Set-Up & MariaDB</a></li>
             <li><a href="#dashboard" className="text-blue-600 hover:underline">Data & Grafana Dashboard</a></li>
             <li><a href="#dataflow" className="text-blue-600 hover:underline">MQTT & Node-RED Dataflow</a></li>
             <li><a href="#control" className="text-blue-600 hover:underline">Fan Control</a></li>
@@ -52,7 +53,8 @@ export default function App() {
             <li><strong>Jan Eberwein:</strong> HEPA Filter Enclosure, Fan-Filter assembly and Fan control</li>
             <li><strong>Leonhard Schnaitl:</strong> Air Quality Sensors & LoRaWAN Data Transfer</li>
             <li><strong>Lisa Reichl:</strong> Holographic display + LoRaWAN Data Transfer</li>
-            <li><strong>Florian Guggenberger &amp; Rawan Gomaa:</strong> Grafana Dashboard and DB storage</li>
+            <li><strong>Florian Guggenberger:</strong> Raspberry Pi Set-Up + MariaDB Connections</li>
+            <li><strong>Rawan Gomaa:</strong> Grafana Dashboard + NodeRED</li>
           </ul>
         </section>
 
@@ -195,7 +197,7 @@ export default function App() {
         # Example: Forwarding tcp://0.tcp.eu.ngrok.io:19617 → localhost:3306
             `}</code>
           </pre>
-
+        
           <h3 className="text-xl font-semibold mt-6 mb-2">Grafana Cloud Data Source Setup</h3>
           <ul className="list-disc list-inside space-y-2">
             <li>Log in to <a href="https://grafana.com" className="text-blue-600 hover:underline">Grafana Cloud</a></li>
@@ -238,6 +240,132 @@ export default function App() {
               smartairproject.grafana.net
             </a>
           </p>
+
+          <br></br>
+
+          <section id="raspberry" className="mb-12">
+          <h3 className="text-3xl font-semibold mb-4">Raspberry Pi Set-Up & MariaDB</h3>
+
+          <h4 className="text-lg font-semibold mb-2">Introduction</h4>
+          <p className="mb-4">
+          For the Smart Air environmental monitoring system, we configured a **Raspberry Pi 4** as the core data processing unit. The process involved overcoming SD card corruption issues, intermittent USB keyboard detection, and headless-access challenges. The final setup includes an operating system, secure SSH access, a **MariaDB** database for sensor data, and Prometheus-compatible metrics for visualization in Grafana.
+          </p>
+
+          <h4 className="text-lg font-semibold mb-2">Hardware Preparation</h4>
+          <p className="mb-4">
+            A Raspberry Pi 4 starter kit was used, which included the board, a protective case, and necessary power and data cables. 
+            The Raspberry Pi was mounted in the case, and peripherals such as power supply and networking cables were connected.
+          </p>
+
+          <h4 className="text-lg font-semibold mb-2">Operating System Installation</h4>
+          <p className="mb-4">
+            The <strong>Raspberry Pi Imager</strong> tool was used to flash <strong>Raspberry Pi OS (64-bit)</strong> onto a microSD card 
+            using a USB/SD card adapter. The Imager is available from the 
+            <a href="https://www.raspberrypi.com/software/" className="text-blue-600 hover:underline"> official Raspberry Pi website</a>. 
+            Predefining system settings such as user credentials, Wi-Fi, and SSH access is possible but was omitted due to SD card issues. 
+            A fresh SD card and basic OS installation resolved these issues for us, so we woudn't be sztuck on the OS BootUp Screen.
+          </p>
+
+          <h4 className="text-lg font-semibold mb-2">First Boot & Initial Setup</h4>
+          <p className="mb-4">
+            On first boot, the setup wizard was used to configure language, region, Wi-Fi, and user credentials. With those commands, system updates were installed:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+        {`sudo apt update
+sudo apt upgrade -y`}
+            </code>
+          </pre>
+          <p className="mb-4">
+            <br></br>
+            SSH access was enabled using <code>raspi-config</code>, allowing remote administration from any PC:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>ssh smartair@192.168.1.203</code>
+          </pre>
+          <img src="images/ssh-connection.png" alt="SSH terminal session" className="rounded shadow my-4" />
+
+          <h4 className="text-lg font-semibold mb-2">MariaDB Installation and Configuration</h4>
+          <p className="mb-4">
+            For the next step, a MariaDB server and client packages were installed onto the raspberry pi.:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>sudo apt install -y mariadb-server mariadb-client</code>
+          </pre>
+          <p className="mb-4">Database hardening was performed using:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>sudo mysql_secure_installation</code>
+          </pre>
+          <p className="mb-4">
+            A database <code>sensordata</code> and a user <code>sensoruser</code> were created:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+        {`CREATE DATABASE sensordata;
+CREATE USER 'sensoruser'@'%' IDENTIFIED BY 'sensorpass';
+GRANT ALL PRIVILEGES ON sensordata.* TO 'sensoruser'@'%';`}
+            </code>
+          </pre>
+          <img src="images/mariadb-setup.png" alt="MariaDB setup" className="rounded shadow my-4" />
+
+          <h4 className="text-lg font-semibold mb-2">Table Creation & Test Data</h4>
+          <p className="mb-4">We then proceeded with creating a table for the sensor data:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+        {`CREATE TABLE sensors (
+          timestamp DATETIME NOT NULL,
+          temperature FLOAT,
+          humidity FLOAT,
+          gas resistance INT,
+          pressure FLOAT
+        );`}
+            </code>
+          </pre>
+          <p className="mb-4">For testing purposes we injected some test samples into the database just to get a visual feedback for grafan:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+        {`INSERT INTO sensors (timestamp, temperature, humidity, co2, pressure) VALUES
+(NOW(), 22.5, 45.3, 410, 1012.5),
+(NOW(), 22.7, 44.8, 420, 1012.3);`}
+            </code>
+          </pre>
+          <img src="images/sensor-data-sample.png" alt="Example sensor data in MariaDB" className="rounded shadow my-4" />
+
+          <h4 className="text-lg font-semibold mb-2">MySQL Exporter for Metrics</h4>
+          <p className="mb-4">That the data is then transfered to the Grafan CLoud we needed a MySQL Exporter to expose database metrics:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>sudo apt install prometheus-mysqld-exporter -y</code>
+          </pre>
+          <p className="mb-4">The exporter was  then configured to use the MariaDB root credentials:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>DATA_SOURCE_NAME="root:rootpass@(localhost:3306)/"</code>
+          </pre>
+          <p className="mb-4">Finally, the Exporter service was restarted and metrics verified:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+        {`sudo systemctl restart prometheus-mysqld-exporter
+curl http://localhost:9104/metrics | grep mysql_up`}
+            </code>
+          </pre>
+          <p className="mb-4">Expected output:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>mysql_up 1</code>
+          </pre>
+          <img src="images/mysql-exporter-metrics.png" alt="MySQL Exporter metrics output" className="rounded shadow my-4" />
+
+          <h4 className="text-lg font-semibold mb-2">Integration with Grafana</h4>
+          <p className="mb-4">
+            The system was prepared to forward database metrics to <strong>Grafana Cloud</strong> using a <strong>Grafana Agent</strong> or a local 
+            Grafana OSS instance. Once connected, <strong>Grafana dashboards</strong> provided visualization of both the database metrics and the 
+            real-time sensor data.
+          </p>
+          <img src="images/grafana-dashboard.png" alt="Grafana dashboard showing sensor data" className="rounded shadow my-4" />
+        </section>
+
+
+          
+
+          
         </section>
 
         {/* Dataflow Step */}
