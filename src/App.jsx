@@ -20,19 +20,19 @@ export default function App() {
             />
             <p className="text-lg text-gray-600">
               Pervasive Computing <a
-  href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
-  className="
+                href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+                className="
     !text-red-700 
     visited:!text-red-700 
     hover:underline
   "
-  target="_blank"
-  rel="noopener noreferrer"
->
-  FH Hagenberg 
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                FH Hagenberg
 
-</a>&nbsp;
- Project
+              </a>&nbsp;
+              Project
             </p>
           </div>
           <p className="mt-4">
@@ -265,7 +265,7 @@ screwhole = 5;          // Diameter of the fan screw holes
 filterhole = 123;       // Outer diameter of the filter insert
 thickness = 1.5;        // Thickness of the flange plate
 insert = 15;            // Length of the insert piece that fits into the filter
-flange_diameter = 173;  // Diameter of the round flange plate
+flange_diameter = 169;  // Diameter of the round flange plate
 
 // Derived parameters
 cone = 0;               // No cone → vertical (straight) transition
@@ -351,15 +351,26 @@ difference() {
           </div>
           <br />
           <p>
-            Now that we have assembled the fan and filter, we can start with the wiring:
+            Now that we have assembled the fan and filter, we can start with the wiring. 
           </p>
-
         </section>
 
         {/* Control Step */}
         <section id="control" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Wiring + Fan Control</h2>
           <p>Wiring of the Fan</p>
+          <br />
+          <p>
+            The 12 V supply from your PSU powers the fan’s red lead, while the black lead and the ESP32 GND are tied together on the breadboard ground rail.
+            </p>
+          <ul class="list-disc list-inside mt-4">
+            <li>
+              The BC547 transistor is wired as a low‐side switch: its <strong>emitter</strong> goes to ground, its <strong>collector</strong> to the fan’s PWM control wire, and its <strong>base</strong> is driven by ESP32 GPIO 13 through a 10 kΩ resistor.
+            </li>
+            <li>
+              The fan’s tachometer lead connects to ESP32 GPIO 12 (configured with an internal pull-up) so the microcontroller can count falling edges for RPM measurement.
+            </li>
+          </ul>
           <br />
           <div className="flex flex-wrap  gap-4 mb-4">
             <img
@@ -376,7 +387,7 @@ difference() {
 
           <br />
           <p>
-            Jan implemented PWM control with the ESP32. Example code in <code>fanControl.ino</code>:
+            <code>fanControl.ino</code> for ESP32:
           </p>
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-arduino">{`
@@ -651,19 +662,19 @@ void loop() {
       </main>
       {/* Footer */}
       <footer className="bg-gray-100 py-4">
-      <div className="container mx-auto text-center text-sm text-gray-600">
-  &copy; 2025{' '}
-  <a
-    href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
-    className="hover:underline text-red-700"
-    target="_blank"
-    rel="noopener noreferrer"
-  >
-    FH Hagenberg
-  </a>
-  . Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
-  Schnaitl
-</div>
+        <div className="container mx-auto text-center text-sm text-gray-600">
+          &copy; 2025{' '}
+          <a
+            href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+            className="hover:underline text-red-700"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            FH Hagenberg
+          </a>
+          . Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
+          Schnaitl
+        </div>
 
       </footer>
     </>
