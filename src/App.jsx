@@ -11,7 +11,7 @@ export default function App() {
 
           <div className="flex items-center justify-center mt-4 space-x-4">
             <img
-              src="/fh-logo.png"
+              src="src/assets/fh-logo.png" 
               alt="FH Oberösterreich Logo"
               className="h-10 w-auto"
             />
@@ -36,6 +36,7 @@ export default function App() {
             <li><a href="#sensors" className="text-blue-600 hover:underline">Sensors & LoRaWAN</a></li>
             <li><a href="#display" className="text-blue-600 hover:underline">Holographic Display</a></li>
             <li><a href="#dashboard" className="text-blue-600 hover:underline">Data & Grafana Dashboard</a></li>
+            <li><a href="#dataflow" className="text-blue-600 hover:underline">MQTT & Node-RED Dataflow</a></li>
             <li><a href="#control" className="text-blue-600 hover:underline">Fan Control</a></li>
           </ul>
         </nav>
@@ -168,26 +169,132 @@ export default function App() {
         <section id="dashboard" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Data & Grafana Dashboard</h2>
           <p>
-            Florian & Rawan store data in MariaDB and visualize it in Grafana. SQL schema:
+            Florian & Rawan developed a cloud-based monitoring dashboard using Grafana Cloud. The system is powered by a MariaDB
+            database running locally on a Windows machine and exposed to the cloud using a secure TCP tunnel via ngrok.
           </p>
-          <pre className="bg-[#262626] text-white p-4 rounded">
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Database Structure</h3>
+          <p>Sensor data is stored in a MySQL-compatible MariaDB database using the following schema:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm mt-2">
             <code className="language-sql">{`
-              CREATE TABLE air_quality (
-                id INT AUTO_INCREMENT,
-                timestamp DATETIME,
-                pm25 FLOAT,
-                co2 FLOAT,
-                PRIMARY KEY(id)
-              );
+        CREATE DATABASE smartairtest;
+
+        CREATE TABLE sensors (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          temperature FLOAT,
+          humidity FLOAT,
+          co2 INT,
+          pressure INT,
+          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        );
             `}</code>
           </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Secure Tunnel Using ngrok</h3>
           <p>
-            Dashboard URL:{' '}
-            <a href="https://grafana.example.com" className="text-blue-600 hover:underline">
-              https://grafana.example.com
+            Since the database runs locally, it is exposed to Grafana Cloud using ngrok. This allows secure, remote access to the
+            database without deploying it on a public server.
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm">
+            <code className="language-bash">{`
+        ngrok config add-authtoken <YOUR_AUTH_TOKEN>
+        ngrok tcp 3306
+        # Example: Forwarding tcp://0.tcp.eu.ngrok.io:19617 → localhost:3306
+            `}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Grafana Cloud Data Source Setup</h3>
+          <ul className="list-disc list-inside space-y-2">
+            <li>Log in to <a href="https://grafana.com" className="text-blue-600 hover:underline">Grafana Cloud</a></li>
+            <li>Go to <strong>Connections → Data Sources → Add New → MySQL</strong></li>
+            <li>Use the following configuration:</li>
+          </ul>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm mt-2">
+            <code>{`
+        Host:     0.tcp.eu.ngrok.io:19617
+        Database: smartairtest
+        Username: grafana_user
+        Password: adminadmin
+        SSL Mode: disable
+            `}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Sample Panel Query</h3>
+          <p>
+            Grafana uses SQL queries to visualize the data. Here's an example for a time series panel showing temperature:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm mt-2">
+            <code className="language-sql">{`
+        SELECT
+          timestamp AS time,
+          temperature
+        FROM sensors
+        ORDER BY timestamp DESC
+        LIMIT 100;
+            `}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Dashboard Output</h3>
+          <p>
+            The dashboard includes time series charts for temperature and humidity, gauges for CO₂ and pressure, and a table for
+            recent measurements.
+          </p>
+          <p className="mt-4">
+            🌐 Live Dashboard:{' '}
+            <a href="https://smartairproject.grafana.net/d/smart-air-mariadb/smart-air-monitoring-dashboard?orgId=1&from=2025-04-30T14:20:36.000Z&to=2025-04-30T14:22:52.000Z&timezone=browser&refresh=5s" className="text-blue-600 hover:underline" target="_blank">
+              smartairproject.grafana.net
             </a>
           </p>
         </section>
+
+        {/* Dataflow Step */}
+        <section id="dataflow" className="mb-12">
+          <h2 className="text-3xl font-semibold mb-4">MQTT & Node-RED Dataflow</h2>
+          <p>
+            The air quality sensors publish real-time environmental data to the MQTT broker using the topic <code>smartair/sensors</code>.
+            A Node-RED flow running locally subscribes to this topic, parses the incoming JSON data, and builds SQL INSERT statements that are executed to store the data in the remote MariaDB database (tunneled via ngrok).
+          </p>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Node-RED Flow Structure</h3>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm">
+            <code>{`
+        [MQTT IN] → [JSON Parser] → [Function Node] → [MariaDB Output]
+            `}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Function Node Example</h3>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm">
+            <code className="language-javascript">{`
+        const d = new Date();
+        const isoTime = d.toISOString();
+
+        msg.topic = \`
+          INSERT INTO sensors (temperature, humidity, co2, pressure, timestamp)
+          VALUES (
+            \${parseFloat(msg.payload.temperature)},
+            \${parseFloat(msg.payload.humidity)},
+            \${parseInt(msg.payload.co2)},
+            \${parseInt(msg.payload.pressure)},
+            '\${isoTime}'
+          );
+        \`;
+        return msg;
+            `}</code>
+          </pre>
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">Simulating Sensor Input with mosquitto_pub</h3>
+          <p>You can simulate an MQTT message using this command from the terminal:</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm mt-2">
+            <code className="language-bash">{`
+        mosquitto_pub -h 192.168.1.1 -p 1883 -t smartair/sensors -m "{\\"temperature\\":24.5,\\"humidity\\":40,\\"co2\\":600,\\"pressure\\":1010}"
+            `}</code>
+          </pre>
+
+          <p className="mt-4">
+            Node-RED receives this data, builds an SQL INSERT statement, and sends it to the MariaDB instance running behind a secure <code>ngrok</code> tunnel. The data is then visualized in real-time using Grafana Cloud.
+          </p>
+        </section>
+                
 
         {/* Control Step */}
         <section id="control" className="mb-12">
