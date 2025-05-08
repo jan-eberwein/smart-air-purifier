@@ -69,37 +69,44 @@ export default function App() {
             <tbody>
               <tr>
                 <td className="border px-4 py-2">ESP32 WROOM32</td>
-                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">2</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/esp32" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/diymore-Nodemcu-Development-Bluetooth-2-ESP32/dp/B0D9BTQRYT/ref=sr_1_3_sspa?dib=eyJ2IjoiMSJ9.0HQysaHgEqFjRs7m20z3kM_xcrtW78mFH_y8RmyvqQzLePX4-fISal3_aMWBirRvXRtX8Nh10a3ajRwbx-1sthttnNRSLyZ6Vr51j-sCN2oARa6N7SgZ7cXWoo_ptd6_FdXtu5h5luil4PcD8Ou1JoGjZ7n_jAXiUarduIBiJ9BAH-B76abPbc2Nednnfxx5wtdpDXGrVFHkQPyxgQkL5t_sGOyrX4F_UIaT6ZMJXVY.JGJFnu33OYTIhLidv9autoIb-5FWDU6OxmajTQxYqhg&dib_tag=se&keywords=wroom%2B32&qid=1746689788&sr=8-3-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">120mm PC Fan</td>
+                <td className="border px-4 py-2">ARCTIC P12 Max - 120mm PC Fan</td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/fan" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/gp/product/B09VDNKL4G/ref=ox_sc_saved_image_1?smid=AUBM4K0YLFI9J&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">Round HEPA Filter</td>
+                <td className="border px-4 py-2">Amazon Basics Round True HEPA Filter</td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/hepa" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/gp/product/B09W9GTZT2/ref=ox_sc_act_image_5?smid=A3JWKAKR8XB7XF&th=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">2N2222 Transistor</td>
+                <td className="border px-4 py-2">BC547 Transistor</td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/2n2222" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/Transistors-Leistungstransistor-Sortiment-Kunststoff-Aufbewahrungsbox/dp/B097XRFK3H/ref=sr_1_1_sspa?crid=2NI0M4W63LWQO&dib=eyJ2IjoiMSJ9.mpW9oGooIYqSyQCReCJ8MawJiFaJtcpkzjOIbGD-AoBrR_h84ZcDOwKHU91pZEaYNQNa74af26mWicP3WsgVw6tEJZdhebef3xn-L3W62RQdvjMzzWKRwThVbQPiZ-O6ueSPi7PBrus0weMJzkbESKpzSYWrh5G_FTefuO3Qt2fRl2y-CQz0WCmlWfvDmg4uL3yeLV3CkGYrtSSB1LRYQzLSN5EMhF0R-hePFE5uhpl0w90WNe6W-MkzxEMESXDRM-dwTnPsZMTZOyGYCVTs6vkKKiQBsqmc6UNhJWHRtqA.dS6ZEPUZtMfG67GjA7TMT194OQdB9HwDzp03TiE8-5A&dib_tag=se&keywords=bc547+transistor&qid=1746690151&sprefix=BC547+Tran%2Caps%2C107&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
                 <td className="border px-4 py-2">10kΩ Resistor</td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/10k" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/Kaiserberg-10K-Widerst%C3%A4nde-St%C3%BCck-DIY-Elektronikprojekte/dp/B0DYPD6XTN/ref=sr_1_1_sspa?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=G8GDDV4AWVC2&dib=eyJ2IjoiMSJ9.pe0UK4LSgfd7x3gdYEgY1iel3jK2tgVRUG-p2XZx1lDf8Wj8-RFEgFMkAVeKLl2iNvAGRg0qEU4m1wpMX-DPBP3b-BikFfB3mgjIZLp20QqsMHJHjsmG8zEBQXT7EtHvv4KobYPeg70xm571lvPqoBuarICdiDpff2I-Tj4fUBgMwv6q2lk9rU5Y8ML4HdEB20vWsRF2pQ2ghRvtTT0chLvCr8Rs1y--u2oQAlRvohbEkdvZ5odfty9BKtQYEqDOOmC7K2wd5DTOxHzHPwAaimeQPBfdgDzsKd7cQXOHuy0.NJG-rKkF9EGtQBjGHmLBhekKfRYfQwWl0gItTxUL5V4&dib_tag=se&keywords=10+kiloohm+resistor&qid=1746689845&sprefix=10+kiloohm+resistor%2Caps%2C80&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">12V Power Supply</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/JZK-Ladeger%C3%A4t-Ersatz-Netzteil-Lichtleiste-Alarmanlage/dp/B0F18ZV715/ref=sr_1_7?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=20DOUB8A5MV8L&dib=eyJ2IjoiMSJ9.nuNjI4IX-8eZWxNx0FXEDeR9OUKFsXTd-PFxZeFe8G0dCVSKnAnhorQKjegLawXCg2qzNvWKClL02et8jjPRfsJVTrdlQjUCK5FKpbhZAL-wF6WrSGd8Bfvds_Jd_QBDhuxi8-FXFC516_hWxDZKpnqlnjCHZt1Rdt52iD9AFxcCL76rQfgzwD5YFWMLzCpKS1OQBrXt-vlSvUbVqT9aTeW5wIetdvnj6N_BA1iYQkbInBZ5YSF0c8BFgCaPYcHgkZAMZYy54450ceJEywX-fKDFhuRW_qVExFwEsGMO0RA.EmTkI7o8YySFcH4MXpbbn18nDOTXR3PeZWgJoz2527E&dib_tag=se&keywords=12V+Netzteil&qid=1746689946&sprefix=12v+netzteil%2Caps%2C111&sr=8-7" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
             </tbody>
