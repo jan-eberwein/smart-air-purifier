@@ -313,6 +313,30 @@ difference() {
               (If it doesn’t fit properly, smooth the edges with sandpaper. Ensure it sits tightly—use tape or sealing rings if necessary.)
             </li>
           </ul>
+          <br />
+          <div className="grid grid-cols-4 gap-4">
+            <img
+              src="./ImagesJan/screwphoto.png"
+              alt="Screw Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/sidephoto.png"
+              alt="Side Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/topphoto.png"
+              alt="Top Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/fullphoto.png"
+              alt="Full Photo"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <br />
           <p>
             Now that we have assembled the fan and filter, we can start with the wiring:
           </p>
@@ -435,6 +459,15 @@ void loop() {
 }
 `}</code>
           </pre>
+          <br />
+          When you drive a fan with a simple map(0,100 → 255,0), you assume: <br />
+          - 50 % input → 50 % of maximum RPM <br /><br />
+          But in practice the motor’s characteristics (coil inductance, back-EMF, friction, bearing drag, nonlinear torque curve) mean that:<br />
+          - Low PWM duty barely overcomes static friction, so the fan may stall or creep at 10 – 20 % input. <br />
+          Around mid-range, the fan “takes off” and RPM jumps more rapidly.
+          Near maximum, efficiency can drop and friction rises, so you see diminishing RPM gains.
+          <br /><br />
+          To overcome this problem, we implement a calibration‐based interpolation that maps each input percentage to the exact PWM duty needed to achieve the corresponding real RPM.
         </section>
 
         {/* Sensors Step */}
