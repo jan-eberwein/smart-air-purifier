@@ -248,7 +248,12 @@ export default function App() {
           <h2 className="text-3xl font-semibold mb-4">Assembly Fan + HEPA Filter</h2>
           <p>
             To make an airtight connection between the HEPA filter and the fan, Jan designed a 3D-printed adapter.
-            <br /><br />
+            <br />
+            <img
+              src="./ImagesJan/filterAdapter3DPrint.png"
+              alt="filterAdapter3DPrint"
+              className="w-auto"
+            />
             OpenSCAD Code:
 
           </p>
@@ -304,12 +309,6 @@ difference() {
             </code>
           </pre>
           <br />
-          <img
-            src="./ImagesJan/filterAdapter3DPrint.png"
-            alt="filterAdapter3DPrint"
-            className="w-auto"
-          />
-          <br />
           <p>
             After printing the adapter, you can assemble the fan and filter as follows:
           </p>
@@ -351,7 +350,7 @@ difference() {
           </div>
           <br />
           <p>
-            Now that we have assembled the fan and filter, we can start with the wiring. 
+            Now that we have assembled the fan and filter, we can start with the wiring.
           </p>
         </section>
 
@@ -362,7 +361,7 @@ difference() {
           <br />
           <p>
             The 12 V supply from your PSU powers the fan’s red lead, while the black lead and the ESP32 GND are tied together on the breadboard ground rail.
-            </p>
+          </p>
           <ul class="list-disc list-inside mt-4">
             <li>
               The BC547 transistor is wired as a low‐side switch: its <strong>emitter</strong> goes to ground, its <strong>collector</strong> to the fan’s PWM control wire, and its <strong>base</strong> is driven by ESP32 GPIO 13 through a 10 kΩ resistor.
