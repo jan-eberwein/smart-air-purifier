@@ -1,5 +1,8 @@
 // File: src/App.jsx
 
+
+
+
 export default function App() {
   return (
     <>
@@ -11,34 +14,46 @@ export default function App() {
 
           <div className="flex items-center justify-center mt-4 space-x-4">
             <img
-              src="src/assets/fh-logo.png" 
+              src="./fhlogo.png"
               alt="FH Oberösterreich Logo"
               className="h-10 w-auto"
             />
             <p className="text-lg text-gray-600">
-              Pervasive Computing FH Hagenberg Project
+              Pervasive Computing <a
+                href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+                className="
+    !text-red-700 
+    visited:!text-red-700 
+    hover:underline
+  "
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                FH Hagenberg
+
+              </a>&nbsp;
+              Project
             </p>
           </div>
           <p className="mt-4">
             Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard Schnaitl
           </p>
         </header>
-        
-
 
         {/* Table of Contents */}
         <nav className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Table of Contents</h2>
           <ul className="list-disc list-inside space-y-2">
-            <li><a href="#introduction" className="text-blue-600 hover:underline">Introduction</a></li>
-            <li><a href="#parts" className="text-blue-600 hover:underline">Parts List</a></li>
-            <li><a href="#assembly" className="text-blue-600 hover:underline">Assembly & Wiring</a></li>
-            <li><a href="#sensors" className="text-blue-600 hover:underline">Sensors & LoRaWAN</a></li>
-            <li><a href="#display" className="text-blue-600 hover:underline">Holographic Display</a></li>
+            <li><a href="#introduction" className="text-red-700 hover:underline">Introduction</a></li>
+            <li><a href="#parts" className="text-red-700  hover:underline">Parts List</a></li>
+            <li><a href="#assembly" className="text-red-700 hover:underline">Assembly Fan + HEPA Filter</a></li>
+            <li><a href="#control" className="text-red-700 hover:underline">Wiring + Fan Control</a></li>
+            <li><a href="#sensors" className="text-red-700 hover:underline">Sensors & LoRaWAN</a></li>
+            <li><a href="#display" className="text-red-700 hover:underline">Holographic Display</a></li>
             <li><a href="#raspberry" className="text-blue-600 hover:underline">Raspberry Pi Set-Up & MariaDB</a></li>
-            <li><a href="#dashboard" className="text-blue-600 hover:underline">Data & Grafana Dashboard</a></li>
-            <li><a href="#dataflow" className="text-blue-600 hover:underline">MQTT & Node-RED Dataflow</a></li>
-            <li><a href="#control" className="text-blue-600 hover:underline">Fan Control</a></li>
+            <li><a href="#dashboard" className="text-red-700 hover:underline">Data & Grafana Dashboard</a></li>
+            <li><a href="#dataflow" className="text-red-700 hover:underline">MQTT & Node-RED Dataflow</a></li>
+
           </ul>
         </nav>
 
@@ -61,10 +76,12 @@ export default function App() {
         {/* Parts List */}
         <section id="parts" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Parts List</h2>
-          <table className="w-full table-auto border-collapse">
+          <table className="w-full table-auto border border-gray-400 border-collapse">
+
             <thead>
               <tr>
                 <th className="border px-4 py-2">Component</th>
+                <th className="border px-4 py-2">Image</th>
                 <th className="border px-4 py-2">Quantity</th>
                 <th className="border px-4 py-2">Source</th>
               </tr>
@@ -72,59 +89,410 @@ export default function App() {
             <tbody>
               <tr>
                 <td className="border px-4 py-2">ESP32 WROOM32</td>
-                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/esp32.jpg"
+                    alt="ESP32 WROOM32"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">2</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/esp32" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/diymore-Nodemcu-Development-Bluetooth-2-ESP32/dp/B0D9BTQRYT/ref=sr_1_3_sspa?dib=eyJ2IjoiMSJ9.0HQysaHgEqFjRs7m20z3kM_xcrtW78mFH_y8RmyvqQzLePX4-fISal3_aMWBirRvXRtX8Nh10a3ajRwbx-1sthttnNRSLyZ6Vr51j-sCN2oARa6N7SgZ7cXWoo_ptd6_FdXtu5h5luil4PcD8Ou1JoGjZ7n_jAXiUarduIBiJ9BAH-B76abPbc2Nednnfxx5wtdpDXGrVFHkQPyxgQkL5t_sGOyrX4F_UIaT6ZMJXVY.JGJFnu33OYTIhLidv9autoIb-5FWDU6OxmajTQxYqhg&dib_tag=se&keywords=wroom%2B32&qid=1746689788&sr=8-3-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&th=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">120mm PC Fan</td>
+                <td className="border px-4 py-2">ARCTIC P12 Max - 120mm PC Fan</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/arcticp12max.jpg"
+                    alt="Artic P12 Max"
+                    className="object-cover w-40"
+                  />
+                </td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/fan" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/gp/product/B09VDNKL4G/ref=ox_sc_saved_image_1?smid=AUBM4K0YLFI9J&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">Round HEPA Filter</td>
+                <td className="border px-4 py-2">Amazon Basics Round True HEPA Filter</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/amazonbasicsfilter.jpg"
+                    alt="Amazon Basics HEPA Filter"
+                    className="object-cover w-40"
+                  />
+                </td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/hepa" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/gp/product/B09W9GTZT2/ref=ox_sc_act_image_5?smid=A3JWKAKR8XB7XF&th=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
-                <td className="border px-4 py-2">2N2222 Transistor</td>
+                <td className="border px-4 py-2">BC547 Transistor</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/transistors.jpg"
+                    alt="BC547 Transistor"
+                    className="object-cover w-40"
+                  />
+                </td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/2n2222" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/Transistors-Leistungstransistor-Sortiment-Kunststoff-Aufbewahrungsbox/dp/B097XRFK3H/ref=sr_1_1_sspa?crid=2NI0M4W63LWQO&dib=eyJ2IjoiMSJ9.mpW9oGooIYqSyQCReCJ8MawJiFaJtcpkzjOIbGD-AoBrR_h84ZcDOwKHU91pZEaYNQNa74af26mWicP3WsgVw6tEJZdhebef3xn-L3W62RQdvjMzzWKRwThVbQPiZ-O6ueSPi7PBrus0weMJzkbESKpzSYWrh5G_FTefuO3Qt2fRl2y-CQz0WCmlWfvDmg4uL3yeLV3CkGYrtSSB1LRYQzLSN5EMhF0R-hePFE5uhpl0w90WNe6W-MkzxEMESXDRM-dwTnPsZMTZOyGYCVTs6vkKKiQBsqmc6UNhJWHRtqA.dS6ZEPUZtMfG67GjA7TMT194OQdB9HwDzp03TiE8-5A&dib_tag=se&keywords=bc547+transistor&qid=1746690151&sprefix=BC547+Tran%2Caps%2C107&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
               <tr>
                 <td className="border px-4 py-2">10kΩ Resistor</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/resistor.jpg"
+                    alt="10kΩ Resistor"
+                    className="object-cover w-40"
+                  />
+                </td>
                 <td className="border px-4 py-2">1</td>
                 <td className="border px-4 py-2">
-                  <a href="https://amzn.to/10k" className="text-blue-600 hover:underline">Amazon</a>
+                  <a href="https://www.amazon.de/Kaiserberg-10K-Widerst%C3%A4nde-St%C3%BCck-DIY-Elektronikprojekte/dp/B0DYPD6XTN/ref=sr_1_1_sspa?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=G8GDDV4AWVC2&dib=eyJ2IjoiMSJ9.pe0UK4LSgfd7x3gdYEgY1iel3jK2tgVRUG-p2XZx1lDf8Wj8-RFEgFMkAVeKLl2iNvAGRg0qEU4m1wpMX-DPBP3b-BikFfB3mgjIZLp20QqsMHJHjsmG8zEBQXT7EtHvv4KobYPeg70xm571lvPqoBuarICdiDpff2I-Tj4fUBgMwv6q2lk9rU5Y8ML4HdEB20vWsRF2pQ2ghRvtTT0chLvCr8Rs1y--u2oQAlRvohbEkdvZ5odfty9BKtQYEqDOOmC7K2wd5DTOxHzHPwAaimeQPBfdgDzsKd7cQXOHuy0.NJG-rKkF9EGtQBjGHmLBhekKfRYfQwWl0gItTxUL5V4&dib_tag=se&keywords=10+kiloohm+resistor&qid=1746689845&sprefix=10+kiloohm+resistor%2Caps%2C80&sr=8-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">12V Power Supply</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/12vpower.jpg"
+                    alt="12V Power Supply"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/JZK-Ladeger%C3%A4t-Ersatz-Netzteil-Lichtleiste-Alarmanlage/dp/B0F18ZV715/ref=sr_1_7?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=20DOUB8A5MV8L&dib=eyJ2IjoiMSJ9.nuNjI4IX-8eZWxNx0FXEDeR9OUKFsXTd-PFxZeFe8G0dCVSKnAnhorQKjegLawXCg2qzNvWKClL02et8jjPRfsJVTrdlQjUCK5FKpbhZAL-wF6WrSGd8Bfvds_Jd_QBDhuxi8-FXFC516_hWxDZKpnqlnjCHZt1Rdt52iD9AFxcCL76rQfgzwD5YFWMLzCpKS1OQBrXt-vlSvUbVqT9aTeW5wIetdvnj6N_BA1iYQkbInBZ5YSF0c8BFgCaPYcHgkZAMZYy54450ceJEywX-fKDFhuRW_qVExFwEsGMO0RA.EmTkI7o8YySFcH4MXpbbn18nDOTXR3PeZWgJoz2527E&dib_tag=se&keywords=12V+Netzteil&qid=1746689946&sprefix=12v+netzteil%2Caps%2C111&sr=8-7" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">2,8" ILI9341 240 * 320 TFT LC Display</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/display.jpg"
+                    alt="2,8'' ILI9341 240 * 320 TFT LC Display"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/ILI9341-Display-Seriell-Arduino-Raspberry/dp/B07YTWRZGR/ref=pd_sbs_d_sccl_2_1/258-8095385-4630869?pd_rd_w=patiM&content-id=amzn1.sym.7587be5d-90aa-4d4b-87a9-869040b4f29f&pf_rd_p=7587be5d-90aa-4d4b-87a9-869040b4f29f&pf_rd_r=XGWWTF0FN8JPNZQGWEYF&pd_rd_wg=g6ole&pd_rd_r=c6ba693c-fade-483c-a1be-04712c09eafe&pd_rd_i=B07YTWRZGR&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Breadboard set with wires for assembly</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/breadboard.jpg"
+                    alt="Breadboard set with wires for assembly"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/BOJACK-Breadboard-Steckbrett-Steckplatine-Steckbrett-%C3%9Cberbr%C3%BCckungsdr%C3%A4hte/dp/B0B18G3V5T/ref=sr_1_1_sspa?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=I4T788B78H7P&dib=eyJ2IjoiMSJ9.Q6x6rXniD6T82he2ZYZ9ppfIOxZEI4ZJd8ZesNPQVZmQCXpm9KtntteznVy30fw7jJC9eZ4NkO-qxdVUvQeHn9xqyOkmJvzNcqtoT5WQO5Z_vwJlQD08izKiAob0v5EBEu3Zx73UhbqRvzN2YaTJhFgClByelO6hn1_5S6fOfjz2vBL8QB5pIhS_cqVq-AMRG-AHarjB2gVLMW5nHLGHc3_MgImG4RuwvbREVux2lZum7UTTzB8MDVgXfrw67ua12TKy8TVOGhKFWbW4b592WtiY6_XDtd_jtVwJ2ujuY-E.pmc1TLnNSsdewFK9uwkuR5IexGDXQTZ1nNJ5F4CPI7E&dib_tag=se&keywords=breadboard&qid=1746691778&s=industrial&sprefix=breadboard%2Cindustrial%2C102&sr=1-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Waveshare SX1262 LoRa Node Module</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/loramodule.jpg"
+                    alt="Waveshare SX1262 LoRa Node Module"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/Waveshare-Raspberry-Support-LoRaWAN-Protocol/dp/B09GK753VY/ref=sr_1_2?dib=eyJ2IjoiMSJ9.yzQYZplujBG_3gNb8GcAPcu7G-yzxRzD-U0LqHX_wXnp1ty7A1EZaChbUdixMbzfq-OeXW5hMcfCG9qUjXL28IllvixpwDPX6rxdfuAzrPTjmDItteM_kGr9CNQfqnhW_GHqXnsmFZ8ihr1eQBebXYm4h6QdbpSCvZlZV77Fw4KTmNU5drDvShExCtlUAZek8aaC83MpL7KC8fJi93TnUqV6fRr31AphMRtZnH1evaI.PR1Zqui5Lh93mvHlukDQoYk_62GadfnhYU5mXxH872s&dib_tag=se&keywords=sx1262+lora+node&qid=1746692025&sr=8-2" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">PM2.5 Air Particle/Dust Sensor</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/particlesensor.jpg"
+                    alt="PM2.5 Air Particle/Dust Sensor"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/particle-Digital-Purifier-PMS5003-Precision/dp/B071J5LL8V/ref=sr_1_3?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=JHYPPXGWSN0N&dib=eyJ2IjoiMSJ9.FAXILI3-lRQuZkfSCQPJcviTviRFPk9WbfBNUWrDbsvxdvdWq6NzwCulpY0H1viLyvP2WNyS1SNmpbu3wA1wJz9R0fwA5iC-G8EBpsKGdLtlP9jqOqrLn0z0vMGRGKVcgNHoezaVC_j6IauPU0Hz_pmQS179bl_C2tG34C4PbxW8sr1oKeePqTYqbDR46kMeuB6tC7XlqAW-aqKRqJanbEJLWgiS6gVXjwl6ytEMozC42GrBlK0qjIJU-4h86QMyK2EI2EkcS1VA5eMiDdWaoTVmfgLtlBCP4HG1FKCYb1w.KJgOXlUlnRV7jlcZfj7et2W9Bjrfsjg47HPUO-uIeI8&dib_tag=se&keywords=pm2.5+sensor+particle&qid=1746692111&sprefix=pm2.5+sensor+particle%2Caps%2C93&sr=8-3" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Adafruit BME680 Temperature, Humidity, Preassure Sensor</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesJan/bme680.jpg"
+                    alt="Adafruit BME680 Sensor"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/-/en/Adafruit-BME680-Temperature-Humidity-Pressure/dp/B07LGWS2S1?dib=eyJ2IjoiMSJ9.r9A8PJ3-WJkXxN1cwo2hBBj26NSYwDLx243kVyycXwf8qOHahY0gcUcWfqI7HJZlbIKp5ZWm1_o2eCwIiNb6NQ3_govLZ-ykBqtGLpSNLl9KMlatnkQ5_6kBQ3DwKNEFQZjwg8t1kDROv279wEubZQYgKPT4v5u0ap949nbhircjxLoQzl2IpSj8wrS8nS4nZbZqxL2YlyePV9xJbaMpnUPyAZqSHgOXxWmHTQheSQdkRgevaH8DCSCa5iF-e7_PZDEIz5mb0lIIHv-L3UNH-Cj7KfSCp0r95uyN1ZWdMtA.LESl47ZuG_HXoefio4Y5_FwduMB0mjYGuMK-J-1TkJg&dib_tag=se&keywords=adafruit+bme680&qid=1745439236&sr=8-1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
             </tbody>
           </table>
         </section>
 
-        {/* Assembly Step */}
+        {/* Assembly Step for Fan + HEPA Filter */}
         <section id="assembly" className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4">Assembly & Wiring</h2>
+          <h2 className="text-3xl font-semibold mb-4">Assembly Fan + HEPA Filter</h2>
           <p>
-            First, assemble the 3D-printed adapter onto the HEPA filter and attach the PC fan. Then wire the power and
-            PWM control:
+            To make an airtight connection between the HEPA filter and the fan, Jan designed a 3D-printed adapter.
+            <br />
+            <img
+              src="./ImagesJan/filterAdapter3DPrint.png"
+              alt="filterAdapter3DPrint"
+              className="w-auto"
+            />
+            OpenSCAD Code:
+
           </p>
-          <ul className="list-decimal list-inside mt-4 space-y-2">
-            <li>Place the adapter on the HEPA filter and screw the fan onto the adapter.</li>
-            <li>Connect the fan's +12V and GND to the breadboard power rails.</li>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-scad">{`
+// -----------------------------
+// HEPA Filter Adapter
+// -----------------------------
+// 120mm fan to 123mm HEPA filter adapter (round flange plate, straight transition)
+$fn = 200; // high resolution for smooth round shapes
+
+// Configurable parameters
+screwhole = 5;          // Diameter of the fan screw holes
+filterhole = 123;       // Outer diameter of the filter insert
+thickness = 1.5;        // Thickness of the flange plate
+insert = 15;            // Length of the insert piece that fits into the filter
+flange_diameter = 169;  // Diameter of the round flange plate
+
+// Derived parameters
+cone = 0;               // No cone → vertical (straight) transition
+wall = thickness * 2;   // Wall thickness of the insert section (inner diameter)
+
+difference() {
+  union() {
+    // Round flange plate
+    translate([60, 60, 0])
+      cylinder(h = thickness, d = flange_diameter);
+
+    // Straight transition without cone (cylinder)
+    translate([60, 60, thickness])
+      cylinder(h = insert, d = filterhole);
+  }
+
+  // Inner hollow space inside the filter insert
+  translate([60, 60, thickness])
+    cylinder(h = insert, d = filterhole - wall);
+
+  // Central air opening in the flange plate
+  translate([60, 60, -1])
+    cylinder(h = thickness + 2, d = 116);
+
+  // Fan screw holes
+  translate([7.5, 7.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([7.5, 112.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([112.5, 7.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([112.5, 112.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+}
+            `}
+            </code>
+          </pre>
+          <br />
+          <p>
+            After printing the adapter, you can assemble the fan and filter as follows:
+          </p>
+          <ul class="list-decimal list-inside mt-4 space-y-2">
             <li>
-              Insert the 2N2222 transistor: base via 10kΩ resistor to ESP32 GPIO13, emitter to GND, collector to the fan's
-              PWM pin.
+              Place the adapter on the HEPA filter and screw the fan onto the adapter.
+              (Make sure to check the direction of the airflow through the fan to ensure correct assembly.)
             </li>
-            <li>Connect the ESP32 GND to the breadboard GND.</li>
+            <li>
+              For a fully airtight seal, insulate the area where the fan is screwed onto the adapter—either with tape or, as I did, with hot glue.
+            </li>
+            <li>
+              Once the fan is securely attached to the adapter, place the assembly on top of the HEPA filter.
+              (If it doesn’t fit properly, smooth the edges with sandpaper. Ensure it sits tightly—use tape or sealing rings if necessary.)
+            </li>
           </ul>
+          <br />
+          <div className="grid grid-cols-4 gap-4">
+            <img
+              src="./ImagesJan/screwphoto.png"
+              alt="Screw Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/sidephoto.png"
+              alt="Side Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/topphoto.png"
+              alt="Top Photo"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesJan/fullphoto.png"
+              alt="Full Photo"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <br />
+          <p>
+            Now that we have assembled the fan and filter, we can start with the wiring.
+          </p>
+        </section>
+
+        {/* Control Step */}
+        <section id="control" className="mb-12">
+          <h2 className="text-3xl font-semibold mb-4">Wiring + Fan Control</h2>
+          <p>Wiring of the Fan</p>
+          <br />
+          <p>
+            The 12 V supply from your PSU powers the fan’s red lead, while the black lead and the ESP32 GND are tied together on the breadboard ground rail.
+          </p>
+          <ul class="list-disc list-inside mt-4">
+            <li>
+              The BC547 transistor is wired as a low‐side switch: its <strong>emitter</strong> goes to ground, its <strong>collector</strong> to the fan’s PWM control wire, and its <strong>base</strong> is driven by ESP32 GPIO 13 through a 10 kΩ resistor.
+            </li>
+            <li>
+              The fan’s tachometer lead connects to ESP32 GPIO 12 (configured with an internal pull-up) so the microcontroller can count falling edges for RPM measurement.
+            </li>
+          </ul>
+          <br />
+          <div className="flex flex-wrap  gap-4 mb-4">
+            <img
+              src="./ImagesJan/wiring_fan_control.JPEG"
+              alt="Wiring of the Fan"
+              className="max-w-xs w-full h-auto"
+            />
+            <img
+              src="./ImagesJan/pwm_pins.jpg"
+              alt="PWM Pins"
+              className="w-150 h-auto"
+            />
+          </div>
+
+          <br />
+          <p>
+            <code>fanControl.ino</code> for ESP32:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-arduino">{`
+// -----------------------------
+// PIN CONFIGURATION
+// -----------------------------
+const int fanPwmPin = 13;   // GPIO13 → PWM output via transistor
+const int tachPin    = 12;  // GPIO12 → tachometer input
+
+// -----------------------------
+// RPM MEASUREMENT
+// -----------------------------
+volatile int pulseCount    = 0;
+volatile unsigned long lastPulse = 0;
+
+void IRAM_ATTR countPulse() {
+  unsigned long now = micros();
+  if (now - lastPulse > 1000) {   // 1 ms debounce
+    pulseCount++;
+    lastPulse = now;
+  }
+}
+
+// -----------------------------
+// Calibration Tables and Constants
+// -----------------------------
+const int   N = 11;
+const float rpmTable[N]  = {   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 };
+const int   dutyTable[N] = { 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 };
+const float maxRpm = 14520.0;    // reference maximum RPM
+
+// runtime variables
+int currentPercent = 0;
+unsigned long lastRpmTime = 0;
+
+// -----------------------------
+// Interpolation Function for Duty
+// -----------------------------
+int getInterpolatedDuty(int percent) {
+  float desiredRpm = percent / 100.0 * maxRpm;
+
+  if (desiredRpm <= rpmTable[0]) return dutyTable[0];
+  if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
+
+  for (int i = 0; i < N - 1; i++) {
+    if (desiredRpm <= rpmTable[i+1]) {
+      float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
+      float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
+      return int(d + 0.5);
+    }
+  }
+  return dutyTable[N-1];
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+
+  pinMode(fanPwmPin, OUTPUT);
+  analogWrite(fanPwmPin, 255);   // start at full speed (0% input)
+
+  pinMode(tachPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
+
+  Serial.println();
+  Serial.println("Enter a value 0–100 in the Serial Monitor and press Enter:");
+}
+
+void loop() {
+  if (Serial.available()) {
+    int p = Serial.parseInt();
+    if (p >= 0 && p <= 100) {
+      currentPercent = p;
+      int duty = getInterpolatedDuty(currentPercent);
+      analogWrite(fanPwmPin, duty);
+      Serial.printf("→ Fan set to %3d%% (Duty=%d)\n", currentPercent, duty);
+    } else {
+      Serial.println("Invalid! Please enter 0–100.");
+    }
+    while (Serial.available()) Serial.read();
+  }
+
+  if (millis() - lastRpmTime >= 1000) {
+    lastRpmTime = millis();
+    noInterrupts();
+    int count = pulseCount;
+    pulseCount = 0;
+    interrupts();
+
+    float rpm = (count / 2.0) * 60.0;  // 2 pulses per rev
+    Serial.printf("Current RPM at %3d%%: %.0f\n", currentPercent, rpm);
+  }
+}
+`}</code>
+          </pre>
+          <br />
+          When you drive a fan with a simple map(0,100 → 255,0), you assume: <br />
+          - 50 % input → 50 % of maximum RPM <br /><br />
+          But in practice the motor’s characteristics (coil inductance, back-EMF, friction, bearing drag, nonlinear torque curve) mean that:<br />
+          - Low PWM duty barely overcomes static friction, so the fan may stall or creep at 10 – 20 % input. <br />
+          Around mid-range, the fan “takes off” and RPM jumps more rapidly.
+          Near maximum, efficiency can drop and friction rises, so you see diminishing RPM gains.
+          <br /><br />
+          To overcome this problem, we implement a calibration‐based interpolation that maps each input percentage to the exact PWM duty needed to achieve the corresponding real RPM.
         </section>
 
         {/* Sensors Step */}
@@ -415,116 +783,26 @@ curl http://localhost:9104/metrics | grep mysql_up`}
             Node-RED receives this data, builds an SQL INSERT statement, and sends it to the MariaDB instance running behind a secure <code>ngrok</code> tunnel. The data is then visualized in real-time using Grafana Cloud.
           </p>
         </section>
-                
 
-        {/* Control Step */}
-        <section id="control" className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4">Fan Control</h2>
-          <p>
-            Jan implemented PWM control with the ESP32. Example code in <code>fanControl.ino</code>:
-          </p>
-          <pre className="bg-[#262626] text-white p-4 rounded">
-            <code className="language-arduino">{`
-// -----------------------------
-// PIN CONFIGURATION
-// -----------------------------
-const int fanPwmPin = 13;   // GPIO13 → PWM output via transistor
-const int tachPin    = 12;  // GPIO12 → tachometer input
 
-// -----------------------------
-// RPM MEASUREMENT
-// -----------------------------
-volatile int pulseCount    = 0;
-volatile unsigned long lastPulse = 0;
 
-void IRAM_ATTR countPulse() {
-  unsigned long now = micros();
-  if (now - lastPulse > 1000) {   // 1 ms debounce
-    pulseCount++;
-    lastPulse = now;
-  }
-}
-
-// -----------------------------
-// Calibration Tables and Constants
-// -----------------------------
-const int   N = 11;
-const float rpmTable[N]  = {   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 };
-const int   dutyTable[N] = { 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 };
-const float maxRpm = 14520.0;    // reference maximum RPM
-
-// runtime variables
-int currentPercent = 0;
-unsigned long lastRpmTime = 0;
-
-// -----------------------------
-// Interpolation Function for Duty
-// -----------------------------
-int getInterpolatedDuty(int percent) {
-  float desiredRpm = percent / 100.0 * maxRpm;
-
-  if (desiredRpm <= rpmTable[0]) return dutyTable[0];
-  if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
-
-  for (int i = 0; i < N - 1; i++) {
-    if (desiredRpm <= rpmTable[i+1]) {
-      float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
-      float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
-      return int(d + 0.5);
-    }
-  }
-  return dutyTable[N-1];
-}
-
-void setup() {
-  Serial.begin(115200);
-  delay(200);
-
-  pinMode(fanPwmPin, OUTPUT);
-  analogWrite(fanPwmPin, 255);   // start at full speed (0% input)
-
-  pinMode(tachPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
-
-  Serial.println();
-  Serial.println("Enter a value 0–100 in the Serial Monitor and press Enter:");
-}
-
-void loop() {
-  if (Serial.available()) {
-    int p = Serial.parseInt();
-    if (p >= 0 && p <= 100) {
-      currentPercent = p;
-      int duty = getInterpolatedDuty(currentPercent);
-      analogWrite(fanPwmPin, duty);
-      Serial.printf("→ Fan set to %3d%% (Duty=%d)\n", currentPercent, duty);
-    } else {
-      Serial.println("Invalid! Please enter 0–100.");
-    }
-    while (Serial.available()) Serial.read();
-  }
-
-  if (millis() - lastRpmTime >= 1000) {
-    lastRpmTime = millis();
-    noInterrupts();
-    int count = pulseCount;
-    pulseCount = 0;
-    interrupts();
-
-    float rpm = (count / 2.0) * 60.0;  // 2 pulses per rev
-    Serial.printf("Current RPM at %3d%%: %.0f\n", currentPercent, rpm);
-  }
-}
-`}</code>
-          </pre>
-        </section>
       </main>
       {/* Footer */}
       <footer className="bg-gray-100 py-4">
         <div className="container mx-auto text-center text-sm text-gray-600">
-          &copy; 2025 FH Hagenberg. Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
+          &copy; 2025{' '}
+          <a
+            href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+            className="hover:underline text-red-700"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            FH Hagenberg
+          </a>
+          . Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
           Schnaitl
         </div>
+
       </footer>
     </>
   );
