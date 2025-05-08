@@ -11,7 +11,7 @@ export default function App() {
 
           <div className="flex items-center justify-center mt-4 space-x-4">
             <img
-              src="src/assets/fh-logo.png" 
+              src="src/assets/fh-logo.png"
               alt="FH Oberösterreich Logo"
               className="h-10 w-auto"
             />
@@ -23,8 +23,6 @@ export default function App() {
             Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard Schnaitl
           </p>
         </header>
-        
-
 
         {/* Table of Contents */}
         <nav className="mb-8">
@@ -32,12 +30,13 @@ export default function App() {
           <ul className="list-disc list-inside space-y-2">
             <li><a href="#introduction" className="text-blue-600 hover:underline">Introduction</a></li>
             <li><a href="#parts" className="text-blue-600 hover:underline">Parts List</a></li>
-            <li><a href="#assembly" className="text-blue-600 hover:underline">Assembly & Wiring</a></li>
+            <li><a href="#assembly" className="text-blue-600 hover:underline">Assembly Fan + HEPA Filter</a></li>
+            <li><a href="#control" className="text-blue-600 hover:underline">Wiring + Fan Control</a></li>
             <li><a href="#sensors" className="text-blue-600 hover:underline">Sensors & LoRaWAN</a></li>
             <li><a href="#display" className="text-blue-600 hover:underline">Holographic Display</a></li>
             <li><a href="#dashboard" className="text-blue-600 hover:underline">Data & Grafana Dashboard</a></li>
             <li><a href="#dataflow" className="text-blue-600 hover:underline">MQTT & Node-RED Dataflow</a></li>
-            <li><a href="#control" className="text-blue-600 hover:underline">Fan Control</a></li>
+    
           </ul>
         </nav>
 
@@ -114,22 +113,189 @@ export default function App() {
           </table>
         </section>
 
-        {/* Assembly Step */}
+        {/* Assembly Step for Fan + HEPA Filter */}
         <section id="assembly" className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4">Assembly & Wiring</h2>
+          <h2 className="text-3xl font-semibold mb-4">Assembly Fan + HEPA Filter</h2>
           <p>
-            First, assemble the 3D-printed adapter onto the HEPA filter and attach the PC fan. Then wire the power and
-            PWM control:
+            To make an airtight connection between the HEPA filter and the fan, Jan designed a 3D-printed adapter.
+            <br /><br />
+            OpenSCAD Code:
+
           </p>
-          <ul className="list-decimal list-inside mt-4 space-y-2">
-            <li>Place the adapter on the HEPA filter and screw the fan onto the adapter.</li>
-            <li>Connect the fan's +12V and GND to the breadboard power rails.</li>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-scad">{`
+// -----------------------------
+// HEPA Filter Adapter
+// -----------------------------
+// 120mm fan to 123mm HEPA filter adapter (round flange plate, straight transition)
+$fn = 200; // high resolution for smooth round shapes
+
+// Configurable parameters
+screwhole = 5;          // Diameter of the fan screw holes
+filterhole = 123;       // Outer diameter of the filter insert
+thickness = 1.5;        // Thickness of the flange plate
+insert = 15;            // Length of the insert piece that fits into the filter
+flange_diameter = 173;  // Diameter of the round flange plate
+
+// Derived parameters
+cone = 0;               // No cone → vertical (straight) transition
+wall = thickness * 2;   // Wall thickness of the insert section (inner diameter)
+
+difference() {
+  union() {
+    // Round flange plate
+    translate([60, 60, 0])
+      cylinder(h = thickness, d = flange_diameter);
+
+    // Straight transition without cone (cylinder)
+    translate([60, 60, thickness])
+      cylinder(h = insert, d = filterhole);
+  }
+
+  // Inner hollow space inside the filter insert
+  translate([60, 60, thickness])
+    cylinder(h = insert, d = filterhole - wall);
+
+  // Central air opening in the flange plate
+  translate([60, 60, -1])
+    cylinder(h = thickness + 2, d = 116);
+
+  // Fan screw holes
+  translate([7.5, 7.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([7.5, 112.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([112.5, 7.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+  translate([112.5, 112.5, -1])
+    cylinder(h = thickness + 2, d = screwhole);
+}
+            `}
+            </code>
+          </pre>
+          <br />
+          <p>
+            After printing the adapter, you can assemble the fan and filter as follows:
+          </p>
+          <ul class="list-decimal list-inside mt-4 space-y-2">
             <li>
-              Insert the 2N2222 transistor: base via 10kΩ resistor to ESP32 GPIO13, emitter to GND, collector to the fan's
-              PWM pin.
+              Place the adapter on the HEPA filter and screw the fan onto the adapter.
+              (Make sure to check the direction of the airflow through the fan to ensure correct assembly.)
             </li>
-            <li>Connect the ESP32 GND to the breadboard GND.</li>
+            <li>
+              For a fully airtight seal, insulate the area where the fan is screwed onto the adapter—either with tape or, as I did, with hot glue.
+            </li>
+            <li>
+              Once the fan is securely attached to the adapter, place the assembly on top of the HEPA filter.
+              (If it doesn’t fit properly, smooth the edges with sandpaper. Ensure it sits tightly—use tape or sealing rings if necessary.)
+            </li>
           </ul>
+          <p>
+            Now that we have assembled the fan and filter, we can start with the wiring:
+          </p>
+
+        </section>
+
+        {/* Control Step */}
+        <section id="control" className="mb-12">
+          <h2 className="text-3xl font-semibold mb-4">Wiring + Fan Control</h2>
+          <p>
+            Jan implemented PWM control with the ESP32. Example code in <code>fanControl.ino</code>:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-arduino">{`
+// -----------------------------
+// PIN CONFIGURATION
+// -----------------------------
+const int fanPwmPin = 13;   // GPIO13 → PWM output via transistor
+const int tachPin    = 12;  // GPIO12 → tachometer input
+
+// -----------------------------
+// RPM MEASUREMENT
+// -----------------------------
+volatile int pulseCount    = 0;
+volatile unsigned long lastPulse = 0;
+
+void IRAM_ATTR countPulse() {
+  unsigned long now = micros();
+  if (now - lastPulse > 1000) {   // 1 ms debounce
+    pulseCount++;
+    lastPulse = now;
+  }
+}
+
+// -----------------------------
+// Calibration Tables and Constants
+// -----------------------------
+const int   N = 11;
+const float rpmTable[N]  = {   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 };
+const int   dutyTable[N] = { 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 };
+const float maxRpm = 14520.0;    // reference maximum RPM
+
+// runtime variables
+int currentPercent = 0;
+unsigned long lastRpmTime = 0;
+
+// -----------------------------
+// Interpolation Function for Duty
+// -----------------------------
+int getInterpolatedDuty(int percent) {
+  float desiredRpm = percent / 100.0 * maxRpm;
+
+  if (desiredRpm <= rpmTable[0]) return dutyTable[0];
+  if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
+
+  for (int i = 0; i < N - 1; i++) {
+    if (desiredRpm <= rpmTable[i+1]) {
+      float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
+      float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
+      return int(d + 0.5);
+    }
+  }
+  return dutyTable[N-1];
+}
+
+void setup() {
+  Serial.begin(115200);
+  delay(200);
+
+  pinMode(fanPwmPin, OUTPUT);
+  analogWrite(fanPwmPin, 255);   // start at full speed (0% input)
+
+  pinMode(tachPin, INPUT_PULLUP);
+  attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
+
+  Serial.println();
+  Serial.println("Enter a value 0–100 in the Serial Monitor and press Enter:");
+}
+
+void loop() {
+  if (Serial.available()) {
+    int p = Serial.parseInt();
+    if (p >= 0 && p <= 100) {
+      currentPercent = p;
+      int duty = getInterpolatedDuty(currentPercent);
+      analogWrite(fanPwmPin, duty);
+      Serial.printf("→ Fan set to %3d%% (Duty=%d)\n", currentPercent, duty);
+    } else {
+      Serial.println("Invalid! Please enter 0–100.");
+    }
+    while (Serial.available()) Serial.read();
+  }
+
+  if (millis() - lastRpmTime >= 1000) {
+    lastRpmTime = millis();
+    noInterrupts();
+    int count = pulseCount;
+    pulseCount = 0;
+    interrupts();
+
+    float rpm = (count / 2.0) * 60.0;  // 2 pulses per rev
+    Serial.printf("Current RPM at %3d%%: %.0f\n", currentPercent, rpm);
+  }
+}
+`}</code>
+          </pre>
         </section>
 
         {/* Sensors Step */}
@@ -294,109 +460,9 @@ export default function App() {
             Node-RED receives this data, builds an SQL INSERT statement, and sends it to the MariaDB instance running behind a secure <code>ngrok</code> tunnel. The data is then visualized in real-time using Grafana Cloud.
           </p>
         </section>
-                
 
-        {/* Control Step */}
-        <section id="control" className="mb-12">
-          <h2 className="text-3xl font-semibold mb-4">Fan Control</h2>
-          <p>
-            Jan implemented PWM control with the ESP32. Example code in <code>fanControl.ino</code>:
-          </p>
-          <pre className="bg-[#262626] text-white p-4 rounded">
-            <code className="language-arduino">{`
-// -----------------------------
-// PIN CONFIGURATION
-// -----------------------------
-const int fanPwmPin = 13;   // GPIO13 → PWM output via transistor
-const int tachPin    = 12;  // GPIO12 → tachometer input
 
-// -----------------------------
-// RPM MEASUREMENT
-// -----------------------------
-volatile int pulseCount    = 0;
-volatile unsigned long lastPulse = 0;
 
-void IRAM_ATTR countPulse() {
-  unsigned long now = micros();
-  if (now - lastPulse > 1000) {   // 1 ms debounce
-    pulseCount++;
-    lastPulse = now;
-  }
-}
-
-// -----------------------------
-// Calibration Tables and Constants
-// -----------------------------
-const int   N = 11;
-const float rpmTable[N]  = {   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 };
-const int   dutyTable[N] = { 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 };
-const float maxRpm = 14520.0;    // reference maximum RPM
-
-// runtime variables
-int currentPercent = 0;
-unsigned long lastRpmTime = 0;
-
-// -----------------------------
-// Interpolation Function for Duty
-// -----------------------------
-int getInterpolatedDuty(int percent) {
-  float desiredRpm = percent / 100.0 * maxRpm;
-
-  if (desiredRpm <= rpmTable[0]) return dutyTable[0];
-  if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
-
-  for (int i = 0; i < N - 1; i++) {
-    if (desiredRpm <= rpmTable[i+1]) {
-      float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
-      float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
-      return int(d + 0.5);
-    }
-  }
-  return dutyTable[N-1];
-}
-
-void setup() {
-  Serial.begin(115200);
-  delay(200);
-
-  pinMode(fanPwmPin, OUTPUT);
-  analogWrite(fanPwmPin, 255);   // start at full speed (0% input)
-
-  pinMode(tachPin, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
-
-  Serial.println();
-  Serial.println("Enter a value 0–100 in the Serial Monitor and press Enter:");
-}
-
-void loop() {
-  if (Serial.available()) {
-    int p = Serial.parseInt();
-    if (p >= 0 && p <= 100) {
-      currentPercent = p;
-      int duty = getInterpolatedDuty(currentPercent);
-      analogWrite(fanPwmPin, duty);
-      Serial.printf("→ Fan set to %3d%% (Duty=%d)\n", currentPercent, duty);
-    } else {
-      Serial.println("Invalid! Please enter 0–100.");
-    }
-    while (Serial.available()) Serial.read();
-  }
-
-  if (millis() - lastRpmTime >= 1000) {
-    lastRpmTime = millis();
-    noInterrupts();
-    int count = pulseCount;
-    pulseCount = 0;
-    interrupts();
-
-    float rpm = (count / 2.0) * 60.0;  // 2 pulses per rev
-    Serial.printf("Current RPM at %3d%%: %.0f\n", currentPercent, rpm);
-  }
-}
-`}</code>
-          </pre>
-        </section>
       </main>
       {/* Footer */}
       <footer className="bg-gray-100 py-4">
