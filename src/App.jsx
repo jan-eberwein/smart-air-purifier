@@ -19,7 +19,20 @@ export default function App() {
               className="h-10 w-auto"
             />
             <p className="text-lg text-gray-600">
-              Pervasive Computing FH Hagenberg Project
+              Pervasive Computing <a
+  href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+  className="
+    !text-red-700 
+    visited:!text-red-700 
+    hover:underline
+  "
+  target="_blank"
+  rel="noopener noreferrer"
+>
+  FH Hagenberg 
+
+</a>&nbsp;
+ Project
             </p>
           </div>
           <p className="mt-4">
@@ -31,14 +44,14 @@ export default function App() {
         <nav className="mb-8">
           <h2 className="text-2xl font-semibold mb-4">Table of Contents</h2>
           <ul className="list-disc list-inside space-y-2">
-            <li><a href="#introduction" className="text-blue-600 hover:underline">Introduction</a></li>
-            <li><a href="#parts" className="text-blue-600 hover:underline">Parts List</a></li>
-            <li><a href="#assembly" className="text-blue-600 hover:underline">Assembly Fan + HEPA Filter</a></li>
-            <li><a href="#control" className="text-blue-600 hover:underline">Wiring + Fan Control</a></li>
-            <li><a href="#sensors" className="text-blue-600 hover:underline">Sensors & LoRaWAN</a></li>
-            <li><a href="#display" className="text-blue-600 hover:underline">Holographic Display</a></li>
-            <li><a href="#dashboard" className="text-blue-600 hover:underline">Data & Grafana Dashboard</a></li>
-            <li><a href="#dataflow" className="text-blue-600 hover:underline">MQTT & Node-RED Dataflow</a></li>
+            <li><a href="#introduction" className="text-red-700 hover:underline">Introduction</a></li>
+            <li><a href="#parts" className="text-red-700  hover:underline">Parts List</a></li>
+            <li><a href="#assembly" className="text-red-700 hover:underline">Assembly Fan + HEPA Filter</a></li>
+            <li><a href="#control" className="text-red-700 hover:underline">Wiring + Fan Control</a></li>
+            <li><a href="#sensors" className="text-red-700 hover:underline">Sensors & LoRaWAN</a></li>
+            <li><a href="#display" className="text-red-700 hover:underline">Holographic Display</a></li>
+            <li><a href="#dashboard" className="text-red-700 hover:underline">Data & Grafana Dashboard</a></li>
+            <li><a href="#dataflow" className="text-red-700 hover:underline">MQTT & Node-RED Dataflow</a></li>
 
           </ul>
         </nav>
@@ -638,10 +651,20 @@ void loop() {
       </main>
       {/* Footer */}
       <footer className="bg-gray-100 py-4">
-        <div className="container mx-auto text-center text-sm text-gray-600">
-          &copy; 2025 FH Hagenberg. Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
-          Schnaitl
-        </div>
+      <div className="container mx-auto text-center text-sm text-gray-600">
+  &copy; 2025{' '}
+  <a
+    href="https://fh-ooe.at/campus-hagenberg?gad_source=1&gad_campaignid=22140940681&gbraid=0AAAAADx1u-wDlQGEdp4TzTMVuhqbWJ-1n&gclid=Cj0KCQjwrPHABhCIARIsAFW2XBPT8g12vNk7GINfkCXVhyhDcqi6ZpXcNJsvGlBPc9Iuuz6uc1uMlQYaAk9sEALw_wcB"
+    className="hover:underline text-red-700"
+    target="_blank"
+    rel="noopener noreferrer"
+  >
+    FH Hagenberg
+  </a>
+  . Jan Eberwein, Rawan Gomaa, Florian Guggenberger, Lisa Reichl, Leonhard
+  Schnaitl
+</div>
+
       </footer>
     </>
   );
