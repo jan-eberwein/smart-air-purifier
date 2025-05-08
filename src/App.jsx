@@ -109,6 +109,41 @@ export default function App() {
                   <a href="https://www.amazon.de/JZK-Ladeger%C3%A4t-Ersatz-Netzteil-Lichtleiste-Alarmanlage/dp/B0F18ZV715/ref=sr_1_7?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=20DOUB8A5MV8L&dib=eyJ2IjoiMSJ9.nuNjI4IX-8eZWxNx0FXEDeR9OUKFsXTd-PFxZeFe8G0dCVSKnAnhorQKjegLawXCg2qzNvWKClL02et8jjPRfsJVTrdlQjUCK5FKpbhZAL-wF6WrSGd8Bfvds_Jd_QBDhuxi8-FXFC516_hWxDZKpnqlnjCHZt1Rdt52iD9AFxcCL76rQfgzwD5YFWMLzCpKS1OQBrXt-vlSvUbVqT9aTeW5wIetdvnj6N_BA1iYQkbInBZ5YSF0c8BFgCaPYcHgkZAMZYy54450ceJEywX-fKDFhuRW_qVExFwEsGMO0RA.EmTkI7o8YySFcH4MXpbbn18nDOTXR3PeZWgJoz2527E&dib_tag=se&keywords=12V+Netzteil&qid=1746689946&sprefix=12v+netzteil%2Caps%2C111&sr=8-7" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
+              <tr>
+                <td className="border px-4 py-2">2,8" ILI9341 240 * 320 TFT LC Display</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/ILI9341-Display-Seriell-Arduino-Raspberry/dp/B07YTWRZGR/ref=pd_sbs_d_sccl_2_1/258-8095385-4630869?pd_rd_w=patiM&content-id=amzn1.sym.7587be5d-90aa-4d4b-87a9-869040b4f29f&pf_rd_p=7587be5d-90aa-4d4b-87a9-869040b4f29f&pf_rd_r=XGWWTF0FN8JPNZQGWEYF&pd_rd_wg=g6ole&pd_rd_r=c6ba693c-fade-483c-a1be-04712c09eafe&pd_rd_i=B07YTWRZGR&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Breadboard set with wires for assembly</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/BOJACK-Breadboard-Steckbrett-Steckplatine-Steckbrett-%C3%9Cberbr%C3%BCckungsdr%C3%A4hte/dp/B0B18G3V5T/ref=sr_1_1_sspa?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=I4T788B78H7P&dib=eyJ2IjoiMSJ9.Q6x6rXniD6T82he2ZYZ9ppfIOxZEI4ZJd8ZesNPQVZmQCXpm9KtntteznVy30fw7jJC9eZ4NkO-qxdVUvQeHn9xqyOkmJvzNcqtoT5WQO5Z_vwJlQD08izKiAob0v5EBEu3Zx73UhbqRvzN2YaTJhFgClByelO6hn1_5S6fOfjz2vBL8QB5pIhS_cqVq-AMRG-AHarjB2gVLMW5nHLGHc3_MgImG4RuwvbREVux2lZum7UTTzB8MDVgXfrw67ua12TKy8TVOGhKFWbW4b592WtiY6_XDtd_jtVwJ2ujuY-E.pmc1TLnNSsdewFK9uwkuR5IexGDXQTZ1nNJ5F4CPI7E&dib_tag=se&keywords=breadboard&qid=1746691778&s=industrial&sprefix=breadboard%2Cindustrial%2C102&sr=1-1-spons&sp_csd=d2lkZ2V0TmFtZT1zcF9hdGY&psc=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Waveshare SX1262 LoRa Node Module</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/Waveshare-Raspberry-Support-LoRaWAN-Protocol/dp/B09GK753VY/ref=sr_1_2?dib=eyJ2IjoiMSJ9.yzQYZplujBG_3gNb8GcAPcu7G-yzxRzD-U0LqHX_wXnp1ty7A1EZaChbUdixMbzfq-OeXW5hMcfCG9qUjXL28IllvixpwDPX6rxdfuAzrPTjmDItteM_kGr9CNQfqnhW_GHqXnsmFZ8ihr1eQBebXYm4h6QdbpSCvZlZV77Fw4KTmNU5drDvShExCtlUAZek8aaC83MpL7KC8fJi93TnUqV6fRr31AphMRtZnH1evaI.PR1Zqui5Lh93mvHlukDQoYk_62GadfnhYU5mXxH872s&dib_tag=se&keywords=sx1262+lora+node&qid=1746692025&sr=8-2" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">PM2.5 Air Particle/Dust Sensor</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/particle-Digital-Purifier-PMS5003-Precision/dp/B071J5LL8V/ref=sr_1_3?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=JHYPPXGWSN0N&dib=eyJ2IjoiMSJ9.FAXILI3-lRQuZkfSCQPJcviTviRFPk9WbfBNUWrDbsvxdvdWq6NzwCulpY0H1viLyvP2WNyS1SNmpbu3wA1wJz9R0fwA5iC-G8EBpsKGdLtlP9jqOqrLn0z0vMGRGKVcgNHoezaVC_j6IauPU0Hz_pmQS179bl_C2tG34C4PbxW8sr1oKeePqTYqbDR46kMeuB6tC7XlqAW-aqKRqJanbEJLWgiS6gVXjwl6ytEMozC42GrBlK0qjIJU-4h86QMyK2EI2EkcS1VA5eMiDdWaoTVmfgLtlBCP4HG1FKCYb1w.KJgOXlUlnRV7jlcZfj7et2W9Bjrfsjg47HPUO-uIeI8&dib_tag=se&keywords=pm2.5+sensor+particle&qid=1746692111&sprefix=pm2.5+sensor+particle%2Caps%2C93&sr=8-3" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
+              <tr>
+                <td className="border px-4 py-2">Adafruit BME680 Temperature, Humidity, Preassure Sensor</td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/-/en/Adafruit-BME680-Temperature-Humidity-Pressure/dp/B07LGWS2S1?dib=eyJ2IjoiMSJ9.r9A8PJ3-WJkXxN1cwo2hBBj26NSYwDLx243kVyycXwf8qOHahY0gcUcWfqI7HJZlbIKp5ZWm1_o2eCwIiNb6NQ3_govLZ-ykBqtGLpSNLl9KMlatnkQ5_6kBQ3DwKNEFQZjwg8t1kDROv279wEubZQYgKPT4v5u0ap949nbhircjxLoQzl2IpSj8wrS8nS4nZbZqxL2YlyePV9xJbaMpnUPyAZqSHgOXxWmHTQheSQdkRgevaH8DCSCa5iF-e7_PZDEIz5mb0lIIHv-L3UNH-Cj7KfSCp0r95uyN1ZWdMtA.LESl47ZuG_HXoefio4Y5_FwduMB0mjYGuMK-J-1TkJg&dib_tag=se&keywords=adafruit+bme680&qid=1745439236&sr=8-1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
             </tbody>
           </table>
         </section>
