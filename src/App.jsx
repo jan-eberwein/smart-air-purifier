@@ -67,7 +67,7 @@ export default function App() {
           <ul className="list-disc list-inside mt-4 space-y-2">
             <li><strong>Jan Eberwein:</strong> HEPA Filter Enclosure, Fan-Filter assembly and Fan control</li>
             <li><strong>Leonhard Schnaitl:</strong> Air Quality Sensors & LoRaWAN Data Transfer</li>
-            <li><strong>Lisa Reichl:</strong> Holographic display + LoRaWAN Data Transfer</li>
+            <li><strong>Lisa Reichl:</strong> Holographic display + WiFi</li>
             <li><strong>Florian Guggenberger:</strong> Raspberry Pi Set-Up + MariaDB Connections</li>
             <li><strong>Rawan Gomaa:</strong> Grafana Dashboard + NodeRED</li>
           </ul>
@@ -517,8 +517,64 @@ void loop() {
         <section id="display" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Holographic Display</h2>
           <p>
-            The holographic display uses a transparent pyramid and a small OLED. Sample code:
+            The holographic display prototype consists of a 2.8" 240x230 LCD display, a holographic prism made of resin, a 3d printed case and a ESP32 for the logic. 
           </p>
+          <h3 className="text-xl font-semibold mt-6 mb-2">3D printed Case</h3>
+          <p>The 3D-printed case encloses the wiring and ESP32, while providing support to stabilize the display so that the prism stands evenly on a flat surface. 
+            Measurements of the display and ESP32 were taken to determine the required dimensions. 
+            The case was then designed using 3D modeling software and printed with an Anycube 3D printer.
+          </p>
+          <br />
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <img
+              src="./ImagesLisa/case_front.png"
+              alt="Case from top right view."
+              className="w-150 h-auto"
+            />
+            <img
+              src="./ImagesLisa/case_bottom.png"
+              alt="Case from bottom view."
+              className="w-150 h-auto"
+            />
+          </div>
+          <p>
+            Due to the plastic breaking when using pre printed holes, we used an approach with four self threaded holes to fit the matching screws. 
+            The display was then fastened from below with four small screws.
+          </p>
+          <br />
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <img
+              src="./ImagesLisa/inside_display.png"
+              alt="inside of 3d printed case from inside with screws"
+              className="w-150 h-auto"
+            />
+          </div>
+          <h3 className="text-xl font-semibold mt-6 mb-2">Holographic prism</h3>
+          <p>
+            A resin-based holographic display functions by using a transparent, pyramidal prism to reflect images from a screen, creating the illusion of a floating three-dimensional object. 
+            Each face of the prism reflects a different angle of a pre-rendered animation, which the viewer perceives as a cohesive volumetric image due to angular light reflection 
+            and human depth perception. The most common way is to fold thick plastic films or similar. However, casting the prism from clear resin improves optical clarity and durability 
+            compared to plastic, allowing for more precise geometries and higher image fidelity. 
+            This is the reason why why chose to use resin for out project. To achieve our result, a mold was 3d printed. 
+            Since non-stick spray did not have any effect, we applied a thin layer of plastic to the sides of the mold. 
+            Then, resin and hardener were mixed in a 1:1 ratio to a total of 30 ml, poured into the mold, and left to dry for 24 hours. 
+            It is important to keep it at warmer temperatures around 20-25°C degrees, because lower temperatures can hinder the drying process, as well as it affects the clarity of the liquid.
+            After 24 hours seperated the prism from the mold by breaking off the plastic mold. Since we used a thin layer of plastic underneath, it was very easy to separate. 
+          </p>
+          <br />
+          <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <img
+              src="./ImagesLisa/prism_1.png"
+              alt="Resin prism"
+              className="w-150 h-auto"
+            />
+            <img
+              src="./ImagesLisa/prism_2.png"
+              alt="Resin prism"
+              className="w-150 h-auto"
+            />
+          </div>  
+          <h3 className="text-xl font-semibold mt-6 mb-2">Wiring</h3>                  
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-javascript">{`
               /* Lisa's OLED Code */
