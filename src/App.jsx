@@ -50,7 +50,7 @@ export default function App() {
             <li><a href="#control" className="text-red-700 hover:underline">Wiring + Fan Control</a></li>
             <li><a href="#sensors" className="text-red-700 hover:underline">Sensors & LoRaWAN</a></li>
             <li><a href="#display" className="text-red-700 hover:underline">Holographic Display</a></li>
-            <li><a href="#raspberry" className="text-blue-600 hover:underline">Raspberry Pi Set-Up & MariaDB</a></li>
+            <li><a href="#raspberry" className="text-red-700 hover:underline">Raspberry Pi Set-Up & MariaDB</a></li>
             <li><a href="#dashboard" className="text-red-700 hover:underline">Data & Grafana Dashboard</a></li>
             <li><a href="#dataflow" className="text-red-700 hover:underline">MQTT & Node-RED Dataflow</a></li>
 
