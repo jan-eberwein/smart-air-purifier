@@ -574,7 +574,124 @@ void loop() {
               className="w-150 h-auto"
             />
           </div>  
-          <h3 className="text-xl font-semibold mt-6 mb-2">Wiring</h3>                  
+          <h3 className="text-xl font-semibold mt-6 mb-2">Wiring</h3>   
+          <p>
+            In the beginning, breadboards were used to test the wiring. After some successful test runs the breadboards were removed and instead, we connected the ESP32 and the display directly. 
+            The following YouTube tutorial was used to gather information about the technical components and the wiring:  
+            <a href="https://www.youtube.com/watch?v=NvBblQnWhsQ&ab_channel=YellowPurple"> ESP32 Tutorial: Using 2.8 Inch SPI TFT LCD Touch Display (ST7789 & ILI9341)</a>.
+            To connect the 3V3 output from the ESP32 to two separate pins on another component, I combined two wires manually. 
+            I stripped a section of insulation from the first wire, then stripped the end of the second wire and twisted it around the exposed section of the first. 
+            After twisting, I soldered the connection to ensure stability and conductivity, then insulated the joint with electrical tape. 
+            This allowed both wires to reliably draw 3.3V from the same output pin.
+            To get everything working, the following pins were connected.
+             </p> 
+            <div className="flex flex-wrap justify-center gap-4 mb-4">
+            <img
+              src="./ImagesLisa/schematic_view.png"
+              alt="Schemativ view and display regions."
+              className="w-150 h-auto"
+            />
+          </div>
+          <div class="overflow-x-auto p-4">
+            <table class="min-w-full table-auto border border-gray-300 shadow-lg rounded-lg">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">TFT Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">ESP32 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-2">TFT_VCC</td>
+                  <td class="px-4 py-2">VIN / 3V3</td>
+                  <td class="px-4 py-2">Power</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_GND</td>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">Ground</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_CS</td>
+                  <td class="px-4 py-2">D15 / GPIO 15</td>
+                  <td class="px-4 py-2">Chip Select</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_RST</td>
+                  <td class="px-4 py-2">D4 / GPIO 4</td>
+                  <td class="px-4 py-2">Reset Pin</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_DC</td>
+                  <td class="px-4 py-2">D2 / GPIO 2</td>
+                  <td class="px-4 py-2">Data/Command</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_MOSI</td>
+                  <td class="px-4 py-2">D23 / GPIO 23</td>
+                  <td class="px-4 py-2">MOSI</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_SCK</td>
+                  <td class="px-4 py-2">D18 / GPIO 18</td>
+                  <td class="px-4 py-2">Clock</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_LED</td>
+                  <td class="px-4 py-2">3V3</td>
+                  <td class="px-4 py-2">LED Backlight</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">TFT_MISO</td>
+                  <td class="px-4 py-2">D19 / GPIO 19</td>
+                  <td class="px-4 py-2">MISO</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <h3 className="text-xl font-semibold mt-6 mb-2">Image Libraries</h3> 
+          <p>
+            The <a href="https://github.com/Bodmer/TFT_eSPI">TFT_eSPI</a> library by Bodmer is a graphics library designed for ESP32 and ESP8266 boards to interface with TFT displays via SPI. 
+            It supports multiple display drivers and provides functions for drawing primitives, text, and images. 
+            In this project, it is used to initialize and control a TFT screen, define colors, and draw graphical content. 
+            The library handles low-level SPI communication and offers optimized routines for efficient rendering, which is necessary for updating the display with minimal delay.
+            In order to select the correct settings for our specific display (ILI9341), we had to adjust the library settings. In the User_Setup_Select file, the line "#include &lt;User_Setup.h&gt;" had to be commented out. 
+            Then Setup 42 ("#include &lt;User_Setups/Setup42_ILI9341_ESP32.h&gt;") had to be uncommented. Next, in the Setup42_ILI9341_ESP32 file we had to make sure that the line "#define ILI9341_DRIVER" was not commented out.
+            <br /><br />
+            The <a href="https://github.com/bitbank2/AnimatedGIF">AnimatedGIF</a> library by Larry Bank allows playback of GIF files on microcontrollers by decoding the image frames and rendering them sequentially. 
+            It supports in-memory GIF data as well as file-based input, and manages frame timing, disposal, and transparency. 
+            In this project, the library is used to decode and display animated plant face images on the TFT screen. 
+            It works in conjunction with TFT_eSPI to draw each frame directly to the screen, allowing animated feedback based on sensor data or MQTT input.
+          </p>
+
+
+          <h3 className="text-xl font-semibold mt-6 mb-2">WIFI connection</h3> 
+          <p>
+            Wi-Fi is used as the communication channel through which the ESP32 receives environmental sensor data, facilitating remote interaction. 
+            The Wi-Fi setup and MQTT functionality are clearly laid out in the code in the next section, illustrating the mechanism by which data is obtained.
+            The ESP32 connects to a local wireless network using the specified SSID ("PCO-01") and password. 
+            Upon successful connection (WiFi.begin(ssid, password)), the device attempts to establish communication with an MQTT broker ("192.168.1.1"), authenticating via username and password. 
+            MQTT (Message Queuing Telemetry Transport) is a lightweight messaging protocol ideal for IoT applications due to its low bandwidth requirement.
+            Once connected, the ESP32 subscribes to a topic ("smartair/processed"), which allows it to listen to all incoming messages sent to this topic. 
+            When a new message arrives, the callback function is triggered. This function receives the message payload, interprets it as a JSON object, and extracts the value for the airquality.
+            This score is then passed to the SetImage function, where based on the score, the device then selects and displays an appropriate GIF image to visually represent the environmental state.
+            In summary, the Wi-Fi component serves as the crucial data acquisition layer, enabling the ESP32 to receive real-time environmental data over the network via MQTT, which it then interprets and displays.
+          </p>
+          <h3 className="text-xl font-semibold mt-6 mb-2">GIF visualization</h3> 
+          <p>
+            To display the GIFs, the system uses pre-converted image data stored in .h header files. 
+            Each GIF is first processed externally — using a conversion tool—to transform the binary animation into a C-compatible array format. 
+            This format allows the image data to be embedded directly into the program’s memory at compile time.
+            The system displays GIFs by rendering preloaded image data directly onto a TFT screen. 
+            The graphics library manages the decoding and playback of the animated images, ensuring smooth frame transitions. 
+            When a specific condition is met — based on the analysis of incoming data — a corresponding GIF is selected from memory. 
+            This selection determines the visual representation of the current environmental state.
+            The chosen GIF is then streamed frame-by-frame onto the display, with drawing operations handled efficiently to maintain performance. 
+            Playback is synchronized within the main loop, allowing the animation to run continuously while the system remains responsive. 
+            This visual feedback mechanism provides an immediate and intuitive way to convey the device's assessment of its surroundings.
+          </p>
+          <h3 className="text-xl font-semibold mt-6 mb-2">c++ Code</h3> 
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-javascript">{`
               /* Lisa's OLED Code */
@@ -583,7 +700,6 @@ void loop() {
             `}</code>
           </pre>
         </section>
-
         {/* Dashboard Step */}
         <section id="dashboard" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Data & Grafana Dashboard</h2>
