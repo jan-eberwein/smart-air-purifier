@@ -664,8 +664,6 @@ void loop() {
             In this project, the library is used to decode and display animated plant face images on the TFT screen. 
             It works in conjunction with TFT_eSPI to draw each frame directly to the screen, allowing animated feedback based on sensor data or MQTT input.
           </p>
-
-
           <h3 className="text-xl font-semibold mt-6 mb-2">WIFI connection</h3> 
           <p>
             Wi-Fi is used as the communication channel through which the ESP32 receives environmental sensor data, facilitating remote interaction. 
@@ -690,8 +688,31 @@ void loop() {
             The chosen GIF is then streamed frame-by-frame onto the display, with drawing operations handled efficiently to maintain performance. 
             Playback is synchronized within the main loop, allowing the animation to run continuously while the system remains responsive. 
             This visual feedback mechanism provides an immediate and intuitive way to convey the device's assessment of its surroundings.
+            <br/> <br/>
           </p>
-          <h3 className="text-xl font-semibold mt-6 mb-2">c++ Code</h3> 
+          <div className="grid grid-cols-4 gap-4">
+            <img
+              src="./ImagesLisa/happy_plants_holo_faces.gif"
+              alt="Good air quality gif"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesLisa/solala.gif"
+              alt="Okay air quality gif"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesLisa/sad.gif"
+              alt="Bad air quality gif"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesLisa/dead_row_4.gif"
+              alt="Horrible air quality gif"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <h3 className="text-xl font-semibold mt-6 mb-2">C++ Code</h3> 
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-javascript">{`
               /* Lisa's OLED Code */
@@ -699,6 +720,33 @@ void loop() {
               // OLED.print("Air Quality: " + data.value);
             `}</code>
           </pre>
+          <h3 className="text-xl font-semibold mt-6 mb-2">Final Look</h3>
+          <div className="grid grid-cols-3 gap-4">
+            <img
+              src="./ImagesLisa/final_01.png"
+              alt="Final display from the front and slightly above"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesLisa/final_02.png"
+              alt="Final display from the front "
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesLisa/final_3.png"
+              alt="Final display from above"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <br />
+          <video class="w-full max-w-3xl mx-auto" autoPlay muted loop>
+            <source
+              src="./ImagesLisa/display_loop.mp4"
+              type="video/mp4"
+            />
+            Your browser does not support the video tag.
+          </video>
+
         </section>
         {/* Dashboard Step */}
         <section id="dashboard" className="mb-12">
