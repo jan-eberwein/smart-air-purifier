@@ -241,6 +241,20 @@ export default function App() {
                   <a href="https://www.amazon.de/-/en/Adafruit-BME680-Temperature-Humidity-Pressure/dp/B07LGWS2S1?dib=eyJ2IjoiMSJ9.r9A8PJ3-WJkXxN1cwo2hBBj26NSYwDLx243kVyycXwf8qOHahY0gcUcWfqI7HJZlbIKp5ZWm1_o2eCwIiNb6NQ3_govLZ-ykBqtGLpSNLl9KMlatnkQ5_6kBQ3DwKNEFQZjwg8t1kDROv279wEubZQYgKPT4v5u0ap949nbhircjxLoQzl2IpSj8wrS8nS4nZbZqxL2YlyePV9xJbaMpnUPyAZqSHgOXxWmHTQheSQdkRgevaH8DCSCa5iF-e7_PZDEIz5mb0lIIHv-L3UNH-Cj7KfSCp0r95uyN1ZWdMtA.LESl47ZuG_HXoefio4Y5_FwduMB0mjYGuMK-J-1TkJg&dib_tag=se&keywords=adafruit+bme680&qid=1745439236&sr=8-1" className="text-blue-600 hover:underline">Amazon Link</a>
                 </td>
               </tr>
+              <tr>
+                <td className="border px-4 py-2">Epoxy Resin + Hardener</td>
+                <td className="border px-4 py-2 flex justify-center items-center">
+                  <img
+                    src="./ImagesLisa/resin.png"
+                    alt="Epoxy Resin & Hardener"
+                    className="object-cover w-40"
+                  />
+                </td>
+                <td className="border px-4 py-2">1</td>
+                <td className="border px-4 py-2">
+                  <a href="https://www.amazon.de/Epoxidharz-18-5oz-Glasklar-Beschichtung-Transparentes/dp/B0B24W3P3H/ref=sr_1_5?__mk_de_DE=%C3%85M%C3%85%C5%BD%C3%95%C3%91&crid=37PWF47JK2B4U&dib=eyJ2IjoiMSJ9.pymRp8BQmvMRailacllJ2WVFZ4JsRO7Xt4BbVGx2LerU_7VbPsJv1UlBNGAhBHGwpkUfX5z7jDt-Sbu0oe0YBphPillTtU0h9OQxuhBRHTk1ofGu0UOziOCKEq9fYftTX1NfYkAIiU_ao52p86FmOd6zAnbqTQiGPf_T-3NNSRi0c3n7NLDgiQZGdX2SUDbo0sUY6dZ5Nj2kcIhd1_6esTPJejT4tbPq-iunYJJaYfcCcIQAKbE8AC8wARm_9-Sd7Xn3QEMFXBMuMfu9GZvCIJXssmb5jajYVZdPPWZbj-k.IfP81WQijALmtxk53Cv_wAwsxenOTvI14CcP2G2n340&dib_tag=se&keywords=epoxidharz%2Bsuper%2Bclear&qid=1745434538&sprefix=epoxidharz%2Bsuper%2Bclear%2Caps%2C104&sr=8-5&th=1" className="text-blue-600 hover:underline">Amazon Link</a>
+                </td>
+              </tr>
             </tbody>
           </table>
         </section>
@@ -538,7 +552,7 @@ void loop() {
             />
           </div>
           <p>
-            Due to the plastic breaking when using pre printed holes, we used an approach with four self threaded holes to fit the matching screws. 
+            Due to the plastic breaking when using pre printed holes (we did not have other resin), we used an approach with four self threaded holes to fit the matching screws. 
             The display was then fastened from below with four small screws.
           </p>
           <br />
@@ -712,12 +726,195 @@ void loop() {
               className="w-full h-auto object-cover"
             />
           </div>
-          <h3 className="text-xl font-semibold mt-6 mb-2">C++ Code</h3> 
+          <h3 className="text-xl font-semibold mt-6 mb-2">C++ Code for the ESP32 handling the display</h3> 
           <pre className="bg-[#262626] text-white p-4 rounded">
             <code className="language-javascript">{`
-              /* Lisa's OLED Code */
-              // OLED.init();
-              // OLED.print("Air Quality: " + data.value);
+#include <WiFi.h>
+#include <PubSubClient.h>
+#include <ArduinoJson.h>
+#include <TFT_eSPI.h>
+#include <AnimatedGIF.h>
+AnimatedGIF gif;
+
+// gif .h files
+#include "happy_plants_holo_faces.h"
+#include "meh_row_2.h"
+#include "sad_row_3.h"
+#include "dead_row_4.h"
+
+// PINS
+#define SCLK_PIN GPIO_NUM_18
+#define MOSI_PIN GPIO_NUM_0
+#define RST_PIN GPIO_NUM_4
+
+// color definitions to test
+#define BLACK 0x0000
+#define BLUE 0x001F
+#define RED 0xF800
+#define GREEN 0x07E0
+#define CYAN 0x07FF
+#define MAGENTA 0xF81F
+#define YELLOW 0xFFE0
+#define WHITE 0xFFFF
+
+// image
+TFT_eSPI tft = TFT_eSPI();
+#define imagewidth 320
+#define imageHeight 240
+#define GIF_IMAGE dead_row_4
+#define NORMAL_SPEED
+const uint8_t* selectedGIF = nullptr;
+size_t selectedGIFSize = 0;
+
+// WiFi
+const char *ssid = "PCO-01"; //  Wi-Fi name
+const char *password = "password";  // Wi-Fi password
+
+// MQTT Broker
+const char *mqtt_broker = "192.168.1.1";
+const char *topic = "smartair/processed";
+const char *mqtt_username = "root";
+const char *mqtt_password = "password";
+const int mqtt_port = 1883;
+
+WiFiClient espClient;
+PubSubClient client(espClient);
+
+void setup() {
+    // Set serial baud rates for both Serial communication and debugging
+    Serial.begin(115200);
+    Serial.println("TFT Screen Initialising");
+
+    // Initialize TFT screen
+    tft.begin();
+    tft.fillScreen(BLACK);
+
+    // Initialize GIF rendering
+    gif.begin(BIG_ENDIAN_PIXELS);
+    setImage(1);
+    Serial.println("Image has been rendered onto screen");
+    
+    // Connecting to Wi-Fi
+    WiFi.begin(ssid, password);
+    while (WiFi.status() != WL_CONNECTED) {
+        delay(500);
+        Serial.println("Connecting to WiFi..");
+    }
+    Serial.println("Connected to the Wi-Fi network");
+
+    // Connecting to MQTT broker
+    client.setServer(mqtt_broker, mqtt_port);
+    client.setCallback(callback);
+    while (!client.connected()) {
+        String client_id = "esp32-client-";
+        client_id += String(WiFi.macAddress());
+        Serial.printf("The client %s connects to the public MQTT broker", client_id.c_str());
+        if (client.connect(client_id.c_str(), mqtt_username, mqtt_password)) {
+            Serial.println("Public EMQX MQTT broker connected");
+        } else {
+            Serial.print("failed with state ");
+            Serial.print(client.state());
+            delay(2000);
+        }
+    }
+
+    // Publish and subscribe to MQTT topic
+    //client.publish(topic, "Hi, I'm ESP32 ^^");
+    client.subscribe(topic);
+    if (client.subscribe("topic")) {
+      Serial.println("Subscribed to topic successfully");
+    } else {
+      Serial.println("Subscription to # failed");
+    }
+    
+    setImage(3);  // default image
+}
+
+
+// callback when data arrives
+void callback(char *topic, byte *payload, unsigned int length) {
+
+    Serial.print("Received message on topic: ");
+    Serial.println(topic);
+    // Convert payload to string
+    String payloadStr;
+    for (unsigned int i = 0; i < length; i++) {
+        payloadStr += (char)payload[i];
+    }
+    Serial.print("Payload: ");
+    Serial.println(payloadStr);
+    Serial.println("-----------------------");
+
+    // Parse JSON
+    StaticJsonDocument<200> doc;
+    DeserializationError error = deserializeJson(doc, payloadStr);
+
+    if (error) {
+        Serial.print("deserializeJson() failed: ");
+        Serial.println(error.c_str());
+        return;
+    }
+
+    assessAirQuality(doc["s"]);  // extract score
+}
+
+
+// map score to image
+void assessAirQuality(float score) {
+  if(score <= 0.25f) {
+    setImage(1);
+  } else if(score <= 0.5f) {
+    setImage(2);
+  } else if(score <= 0.75f) {
+    setImage(3);
+  } else  {
+    setImage(4);
+  }
+}
+
+// set image to display
+void setImage(int imageNumber) {
+  switch (imageNumber) {
+    case 4:
+      selectedGIF = happy_plants_holo_faces;
+      selectedGIFSize = sizeof(happy_plants_holo_faces);
+      break;
+    case 3:
+      selectedGIF = meh_row_2;
+      selectedGIFSize = sizeof(meh_row_2);
+      break;
+    case 2:
+      selectedGIF = sad_row_3;
+      selectedGIFSize = sizeof(sad_row_3);
+      break;
+    case 1:
+      selectedGIF = dead_row_4;
+      selectedGIFSize = sizeof(dead_row_4);
+      break;
+    default:
+      selectedGIF = meh_row_2;
+      selectedGIFSize = sizeof(meh_row_2);
+      break;
+  }
+} 
+
+void loop() {
+    // Handle MQTT client communication
+    client.loop();
+    // Handle GIF display if a GIF is selected
+    if (selectedGIF != nullptr && gif.open((uint8_t *)selectedGIF, selectedGIFSize, GIFDraw)) {
+        // Start TFT screen drawing
+        tft.startWrite();
+        // Play the GIF frames
+        while (gif.playFrame(true, NULL)) {
+          client.loop();  // again
+          yield(); // Allow the processor to handle other tasks
+        }
+        gif.close();
+        tft.endWrite();
+    }
+    
+}
             `}</code>
           </pre>
           <h3 className="text-xl font-semibold mt-6 mb-2">Final Look</h3>
