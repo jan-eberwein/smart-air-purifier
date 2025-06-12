@@ -844,7 +844,19 @@ void loop() {
             A Raspberry Pi 4 starter kit was used, which included the board, a protective case, and necessary power and data cables. 
             The Raspberry Pi was mounted in the case, and peripherals such as power supply and networking cables were connected.
           </p>
-
+          <div className="grid grid-cols-2 gap-3">
+            <img
+              src="./ImagesFlo/raspberrysetup.jpg"
+              alt="Setup of the Raspberry Pi"
+              className="w-full h-auto object-cover"
+            />
+            <img
+              src="./ImagesFlo/Raspberrybootup.jpg"
+              alt="Raspberry Pi booting up"
+              className="w-full h-auto object-cover"
+            />
+          </div>
+          <br></br>
           <h4 className="text-lg font-semibold mb-2">Operating System Installation</h4>
           <p className="mb-4">
             The <strong>Raspberry Pi Imager</strong> tool was used to flash <strong>Raspberry Pi OS (64-bit)</strong> onto a microSD card 
@@ -853,7 +865,14 @@ void loop() {
             Predefining system settings such as user credentials, Wi-Fi, and SSH access is possible but was omitted due to SD card issues. 
             A fresh SD card and basic OS installation resolved these issues for us, so we woudn't be sztuck on the OS BootUp Screen.
           </p>
-
+          <div>
+            <img
+              src="./ImagesFlo/Imager.png"
+              alt="Raspberry Pi boot"
+              className="width: 75% h-auto object-cover"
+            />
+          </div>
+          <br></br>
           <h4 className="text-lg font-semibold mb-2">First Boot & Initial Setup</h4>
           <p className="mb-4">
             On first boot, the setup wizard was used to configure language, region, Wi-Fi, and user credentials. With those commands, system updates were installed:
@@ -871,7 +890,7 @@ sudo apt upgrade -y`}
           <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
             <code>ssh smartair@192.168.1.203</code>
           </pre>
-          <img src="images/ssh-connection.png" alt="SSH terminal session" className="rounded shadow my-4" />
+          <img src="ImagesFlo/ShellRaspberryPI.png" alt="SSH terminal session" className="rounded shadow my-4" />
 
           <h4 className="text-lg font-semibold mb-2">MariaDB Installation and Configuration</h4>
           <p className="mb-4">
@@ -894,8 +913,7 @@ CREATE USER 'sensoruser'@'%' IDENTIFIED BY 'sensorpass';
 GRANT ALL PRIVILEGES ON sensordata.* TO 'sensoruser'@'%';`}
             </code>
           </pre>
-          <img src="images/mariadb-setup.png" alt="MariaDB setup" className="rounded shadow my-4" />
-
+          
           <h4 className="text-lg font-semibold mb-2">Table Creation & Test Data</h4>
           <p className="mb-4">We then proceeded with creating a table for the sensor data:</p>
           <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
@@ -909,7 +927,7 @@ GRANT ALL PRIVILEGES ON sensordata.* TO 'sensoruser'@'%';`}
         );`}
             </code>
           </pre>
-          <p className="mb-4">For testing purposes we injected some test samples into the database just to get a visual feedback for grafan:</p>
+          <p className="mb-4">For testing purposes we injected some test samples into the database just to get a visual feedback for grafana:</p>
           <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
             <code>
         {`INSERT INTO sensors (timestamp, temperature, humidity, co2, pressure) VALUES
@@ -917,8 +935,26 @@ GRANT ALL PRIVILEGES ON sensordata.* TO 'sensoruser'@'%';`}
 (NOW(), 22.7, 44.8, 420, 1012.3);`}
             </code>
           </pre>
-          <img src="images/sensor-data-sample.png" alt="Example sensor data in MariaDB" className="rounded shadow my-4" />
+          
 
+          
+          
+          <p className="mb-4">What was still missing was a way the overall air quality and rounds per minutes, so we also additionally added an air_quality_score and fans_rpm to our sensordata database</p>
+          <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
+            <code>
+          {`ALTER TABLE sensors ADD COLUMN air_quality_score FLOAT;`}<br></br>
+          {`ALTER TABLE sensors ADD COLUMN fan_rpm INT;`}
+            </code>
+          </pre>
+          
+
+          <p className="mb-4">Finally our MariaDB looks like this in the picture below and was ready to receive data from our sensors to display it onto the Grafana dashboard:</p>
+          <img src="ImagesFlo/MariaDBfinal.png" alt="Example sensor data in MariaDB" className="rounded shadow my-4" />
+          <img
+            src="ImagesFlo/DBBeaverMariaDb.png"
+            alt="MariaDB setup"
+            className="rounded shadow my-4 w-300 mx-auto"
+          />
           <h4 className="text-lg font-semibold mb-2">MySQL Exporter for Metrics</h4>
           <p className="mb-4">That the data is then transfered to the Grafan CLoud we needed a MySQL Exporter to expose database metrics:</p>
           <pre className="bg-[#262626] text-white p-4 rounded text-sm overflow-x-auto">
