@@ -943,7 +943,7 @@ void loop() {
             />
             Your browser does not support the video tag.
           </video>
-
+        
         </section>
         {/* Dashboard Step */}
         <section id="dashboard" className="mb-12">
@@ -1184,7 +1184,7 @@ curl http://localhost:9104/metrics | grep mysql_up`}
         </section>
 
 
-          
+         <h2 className="text-3xl font-semibold mb-4">PDC-Agent</h2> 
 
           
         </section>
