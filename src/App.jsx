@@ -513,18 +513,1214 @@ void loop() {
         <section id="sensors" className="mb-12">
           <h2 className="text-3xl font-semibold mb-4">Sensors & LoRaWAN</h2>
           <p>
-            Air quality is measured with PM2.5 and CO₂ sensors. Data is sent over LoRaWAN to The Things Network. Sample code:
+            Air quality is measured with the PMS5003 and BME680 sensors. Data is sent over LoRaWAN to The Things Network.
+          </p>
+          <h3 className="text-xl font-semibold mt-6 mb-2">BME680 Sensor</h3>
+          <p>
+            The BME680 sensor measures temperature, humidity, pressure, and gas levels.
+            It uses I2C communication, which is straightforward to set up with the ESP32.
+            The sensor is connected to the ESP32 using the following pins:
+          </p>
+          <div class="overflow-x-auto p-4">
+            <table class="min-w-full table-auto border border-gray-300 shadow-lg rounded-lg">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">BME680 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">ESP32 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-2">3Vo</td>
+                  <td class="px-4 py-2">VIN / 3V3</td>
+                  <td class="px-4 py-2">Power</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">Ground</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">SCK</td>
+                  <td class="px-4 py-2">GPIO 22</td>
+                  <td class="px-4 py-2">Clock Line</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">SDI</td>
+                  <td class="px-4 py-2">GPIO 21</td>
+                  <td class="px-4 py-2">Data Line</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <p>
+            The BME680 library is used to read data from the sensor. The following class shows how to initialize and read data from the BME680 sensor:
           </p>
           <pre className="bg-[#262626] text-white p-4 rounded">
-            <code className="language-cpp">{`
-              /* Leonhard's LoRaWAN Code */
-              // Setup sensor and LoRa
-              // Serial.begin(9600);
-              // Sensor.readPM();
-              // LoRa.begin();
-              // LoRa.send(data);
-            `}</code>
+            <code className="language-cpp">{`#ifndef BME_H
+#define BME_H
+
+#include <Wire.h>
+#include <SPI.h>
+#include <Adafruit_Sensor.h>
+#include "Adafruit_BME680.h"
+
+namespace SmartAirControl {
+    class BMEData {
+        public:
+            BMEData()
+                : temperature(0.0),
+                  pressure(0.0),
+                  humidity(0.0),
+                  altitude(0.0),
+                  gasResistance(0.0) {}
+
+            float temperature;  /** Temperature in degrees celsius */
+            float pressure;     /** Pressure in hPa */
+            float humidity;     /** Humidity in % */
+            float altitude;     /** Altitude in meters */
+            float gasResistance;/** Gas resistance in KOhms */
+    };
+
+    class BME {
+        private:
+            Adafruit_BME680 bme;
+            BMEData bmeData;
+            uint8_t tempOversampling;
+            uint8_t humidityOversampling;
+            uint8_t pressureOversampling;
+            uint8_t IIRFilterSize;
+            int gasHeaterTemp;
+            int gasHeaterDuration;
+            float sealevelPressure_hPa;
+            bool valid = false;
+        public:
+            BME(u_int8_t tempOversampling,
+                u_int8_t humidityOversampling,
+                u_int8_t pressureOversampling,
+                u_int8_t IIRFilterSize,
+                int gasHeaterTemp,
+                int gasHeaterDuration,
+                float seaLevelPressure_hPa);
+
+            void setup();
+            BMEData read();
+            bool isValid();
+            void printSensorData(BMEData& bmeData);
+    };
+
+}
+
+#endif // BME_H`}
+            </code>
           </pre>
+          <br />
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include "BME.h"
+
+namespace SmartAirControl {
+
+    BME::BME(u_int8_t tempOversampling,
+            u_int8_t humidityOversampling,
+            u_int8_t pressureOversampling,
+            u_int8_t IIRFilterSize,
+            int gasHeaterTemp,
+            int gasHeaterDuration,
+            float seaLevelPressure_hPa)
+          : bme(Adafruit_BME680()),
+          tempOversampling(tempOversampling),
+          humidityOversampling(humidityOversampling),
+          pressureOversampling(pressureOversampling),
+          IIRFilterSize(IIRFilterSize),
+          gasHeaterTemp(gasHeaterTemp),
+          gasHeaterDuration(gasHeaterDuration),
+          sealevelPressure_hPa(seaLevelPressure_hPa)
+            {}
+
+    void BME::setup() {
+      valid = bme.begin();
+      if (!valid) {
+          Serial.println(F("[BME680] Could not find a valid BME680 sensor, check wiring!"));
+      }
+
+      // Set up oversampling and filter initialization
+      bme.setTemperatureOversampling(tempOversampling);
+      bme.setHumidityOversampling(humidityOversampling);
+      bme.setPressureOversampling(pressureOversampling);
+      bme.setIIRFilterSize(IIRFilterSize);
+      bme.setGasHeater(gasHeaterTemp, gasHeaterDuration);
+    }
+
+    bool BME::isValid() {
+      return valid;
+    }
+
+    BMEData BME::read() {
+      BMEData bmeData = BMEData();
+      unsigned long endTime = bme.beginReading();
+      if (endTime == 0) {
+        Serial.println(F("[BME680] Failed to begin reading!"));
+        return bmeData;
+      }
+
+      if (!bme.endReading()) {
+        Serial.println(F("[BME680] Failed to complete reading!"));
+        return bmeData;
+      }
+
+      bmeData.temperature = bme.temperature;
+      bmeData.pressure = bme.pressure / 100.0;
+      bmeData.humidity = bme.humidity;
+      bmeData.altitude = bme.readAltitude(sealevelPressure_hPa);
+      bmeData.gasResistance = bme.gas_resistance / 1000.0;
+
+      printSensorData(bmeData);
+      
+      return bmeData;
+    }
+
+    void BME::printSensorData(BMEData& bmeData) {
+      // cut for brevity
+    }
+
+}`}</code>
+          </pre>
+          <h3 className="text-xl font-semibold mt-6 mb-2">PMS5003 Sensor</h3>
+          <p>
+            The PMS5003 sensor measures PM2.5 and PM10 particles in the air.
+            It uses UART communication, which requires connecting the sensor to the ESP32 using the following pins:
+          </p>
+          <div class="overflow-x-auto p-4">
+            <table class="min-w-full table-auto border border-gray-300 shadow-lg rounded-lg">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">PMS5003 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">ESP32 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-2">Pin 1 / VCC</td>
+                  <td class="px-4 py-2">5V</td>
+                  <td class="px-4 py-2">Power</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">Pin 2 / GND</td>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">Ground</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">Pin 5 / TX</td>
+                  <td class="px-4 py-2">GPIO 16</td>
+                  <td class="px-4 py-2">Data</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">Pin 4 / RX</td>
+                  <td class="px-4 py-2">GPIO 17</td>
+                  <td class="px-4 py-2">Commands to PMS</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+          <img
+              src="./ImagesLeon/PMS_PINOUT.png"
+              alt="PMS5003 Pinout"
+              className="w-150 h-auto justify-center mx-auto mb-4"
+            />
+          <p>
+            The PMS5003 library is used to read data from the sensor. The following class shows how to initialize and read data from the PMS5003 sensor:
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include <Arduino.h>
+#include <HardwareSerial.h>
+#include <Adafruit_PM25AQI.h>
+
+namespace SmartAirControl {
+
+    class PMS {
+        public:
+            PMS(int rxPin, int txPin, unsigned long serialBaud, SerialConfig serialConfig);
+            PM25_AQI_Data read();
+            void setup();
+            void printSensorData();
+        private:
+            PM25_AQI_Data data;
+            HardwareSerial pmsSerial;
+            unsigned long serialBaud;
+            SerialConfig serialConfig;
+            int rxPin;
+            int txPin;
+            Adafruit_PM25AQI pms;
+    };
+}`}</code>
+          </pre>
+          <br />
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include "PMS.h"
+
+namespace SmartAirControl {
+
+  SmartAirControl::PMS::PMS(int rxPin, int txPin, unsigned long serialBaud, SerialConfig serialConfig) 
+      : pmsSerial(HardwareSerial(2)), serialBaud(serialBaud), serialConfig(serialConfig), rxPin(rxPin), txPin(txPin), pms(Adafruit_PM25AQI()) {
+  }
+
+  void SmartAirControl::PMS::setup() {
+    pmsSerial.begin(9600, SERIAL_8N1, 16, 17);
+      
+    if (!pms.begin_UART(&pmsSerial)) {
+      Serial.println("[PMS5003] Could not find PMS5003 sensor, check wiring!");
+      while (1) {
+        delay(10);
+      }
+    }
+  }
+    
+  PM25_AQI_Data SmartAirControl::PMS::read() {
+    data = PM25_AQI_Data();
+    if (!pms.read(&data)) {
+      Serial.println("[PMS5003] Could not read from PMS5003 sensor!");
+      return data;
+    }
+
+    printSensorData();
+
+    return data;
+  }
+
+  void PMS::printSensorData() {
+    // cut for brevity
+  }
+}`}</code>
+          </pre>
+          <h3 className="text-xl font-semibold mt-6 mb-2">Modified Fan Control</h3>
+          <p>
+            The fan control is modified to work like a module that can be used in the main application.
+            The fan control class is defined in <code>Fan.h</code> and implemented in <code>Fan.cpp</code>.
+            The Fan pins are the same as in the <a href="#control" className="text-red-700 hover:underline">Fan Control</a>  section, but the class now includes methods for setting the RPM percentage and getting the current RPM.
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include <Arduino.h>
+
+namespace SmartAirControl {
+    class Fan {
+        public:
+            Fan(int fanPwmPin, int tachPin);
+            void setup();
+            int getRpm();
+            void setRpmPercent(int percent);
+            float getRpmPercent();
+
+        private:
+            static const int N = 11;
+            int fanPwmPin;
+            int tachPin;
+            static volatile int pulseCount;
+            static volatile unsigned long lastPulse;
+            int rpmTable[N];
+            int dutyTable[N];
+            float maxRpm;
+            int currentPercent;
+            unsigned long lastRpmTime;
+
+            int getInterpolatedDuty(int percent);
+            static void IRAM_ATTR countPulse();
+    };
+}`}</code>
+          </pre>
+          <br />
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include "Fan.h"
+#include <Arduino.h>
+
+namespace SmartAirControl {
+
+// Define static member variables
+volatile int Fan::pulseCount = 0;
+volatile unsigned long Fan::lastPulse = 0;
+
+    Fan::Fan(int fanPwmPin, int tachPin)
+        : fanPwmPin(fanPwmPin), tachPin(tachPin),
+          rpmTable{   0,   780,  1140,  1440,  1740,  2730,  6720,  9960, 12930, 14520, 12570 },
+          dutyTable{ 255,   230,   204,   179,   153,   128,   102,    77,    51,    26,     0 },
+          maxRpm(14520.0), currentPercent(0), lastRpmTime(0) {
+    }
+
+    void Fan::setup() {
+        pinMode(fanPwmPin, OUTPUT);
+        analogWrite(fanPwmPin, 255); 
+
+        pinMode(tachPin, INPUT_PULLUP);
+        attachInterrupt(digitalPinToInterrupt(tachPin), countPulse, FALLING);
+    }
+
+    int Fan::getRpm() {
+        // Get the current time and calculate time since last measurement
+        unsigned long currentTime = millis();
+        unsigned long elapsedTime = currentTime - lastRpmTime;
+        lastRpmTime = currentTime;
+
+        noInterrupts();
+        int count = pulseCount;
+        pulseCount = 0;
+        interrupts();
+
+        // Prevent division by zero and handle the first run
+        if (elapsedTime > 0) {
+            // Revolutions = (pulse count / 2 pulses per revolution)
+            float revolutions = count / 2.0;
+            
+            // Time in seconds = elapsed time in milliseconds / 1000
+            float elapsedSeconds = elapsedTime / 1000.0;
+            
+            // RPM = (revolutions / seconds) * 60
+            float rpm = (revolutions / elapsedSeconds) * 60.0;
+            return rpm;
+        } else {
+            return 0;
+        }
+    }
+
+    float Fan::getRpmPercent() {
+        return currentPercent;
+    }
+    
+    void Fan::setRpmPercent(int percent) {
+        if (percent < 0) percent = 0;
+        if (percent > 100) percent = 100;
+
+        if (currentPercent != percent) {
+            currentPercent = percent;
+            int duty = getInterpolatedDuty(percent);
+            analogWrite(fanPwmPin, duty);
+        }
+    }
+    
+
+    int Fan::getInterpolatedDuty(int percent) {
+        float desiredRpm = percent / 100.0 * maxRpm;
+
+        // unterhalb Minimum
+        if (desiredRpm <= rpmTable[0]) return dutyTable[0];
+        // oberhalb Maximum
+        if (desiredRpm >= rpmTable[N-1]) return dutyTable[N-1];
+
+        // Segment suchen und interpolieren
+        for (int i = 0; i < N - 1; i++) {
+            if (desiredRpm <= rpmTable[i+1]) {
+            float frac = (desiredRpm - rpmTable[i]) / (rpmTable[i+1] - rpmTable[i]);
+            float d    = dutyTable[i] + frac * (dutyTable[i+1] - dutyTable[i]);
+            return int(d + 0.5);  // aufrunden
+            }
+        }
+        return dutyTable[N-1];
+    }
+
+    void IRAM_ATTR Fan::countPulse() {
+        unsigned long now = micros();
+        if (now - lastPulse > 1000) {   // 1 ms Debounce
+            pulseCount++;
+            lastPulse = now;
+        }
+    }
+}`}</code>
+          </pre>
+          <br />
+          <h3 className="text-xl font-semibold mt-6 mb-2">LoRaWAN with SX1262 LoRa Node</h3>
+          <p>
+            The ESP32 is connected to The Things Network (TTN) using the RadioLib library and the SX1262 LoRa module.
+            The LoRaWAN class handles the connection and communication with the LoRaWAN network.
+            The following table shows the pin connections between the ESP32 and the SX1262 LoRa module:
+          </p>
+          <div class="overflow-x-auto p-4">
+            <table class="min-w-full table-auto border border-gray-300 shadow-lg rounded-lg">
+              <thead class="bg-gray-200">
+                <tr>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">SX1262 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">ESP32 Pin</th>
+                  <th class="px-4 py-2 text-left text-sm font-semibold text-gray-700">Description</th>
+                </tr>
+              </thead>
+              <tbody class="bg-white divide-y divide-gray-200">
+                <tr>
+                  <td class="px-4 py-2">3V3</td>
+                  <td class="px-4 py-2">3V3</td>
+                  <td class="px-4 py-2">Power</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">GND</td>
+                  <td class="px-4 py-2">Ground</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">DIO 1</td>
+                  <td class="px-4 py-2">GPIO 02</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">BUSY</td>
+                  <td class="px-4 py-2">GPIO 04</td>
+                  <td class="px-4 py-2">Busy signal</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">RESET</td>
+                  <td class="px-4 py-2">GPIO 14</td>
+                  <td class="px-4 py-2">Reset signal</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">MISO</td>
+                  <td class="px-4 py-2">GPIO 19</td>
+                  <td class="px-4 py-2">SPI MISO</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">MOSI</td>
+                  <td class="px-4 py-2">GPIO 23</td>
+                  <td class="px-4 py-2">SPI MOSI</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">SLK</td>
+                  <td class="px-4 py-2">GPIO 18</td>
+                  <td class="px-4 py-2">SPI Clock</td>
+                </tr>
+                <tr>
+                  <td class="px-4 py-2">NS</td>
+                  <td class="px-4 py-2">GPIO 05</td>
+                  <td class="px-4 py-2">Chip Select</td>
+                </tr>
+
+              </tbody>
+            </table>
+          </div>
+          <br />
+          <p>
+            The LoRaWAN class is defined in <code>LoRaWAN.h</code> and implemented in <code>LoRaWAN.hpp</code>.
+          </p>
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#ifndef LORAWAN_H
+#define LORAWAN_H
+
+#include <RadioLib.h>
+#include <cstdint>
+#include <esp_attr.h>
+#include <functional>
+#include <string>
+
+namespace SmartAirControl {
+
+    // utilities & vars to support ESP32 deep-sleep. The RTC_DATA_ATTR attribute
+    // puts these in to the RTC memory which is preserved during deep-sleep
+    extern RTC_DATA_ATTR uint16_t bootCountSinceUnsuccessfulJoin;
+    extern RTC_DATA_ATTR uint8_t session[];
+
+    template <typename LoRaModule>
+    class LoRaWAN {
+    public:
+        LoRaWAN(const LoRaWANBand_t& region,
+                const uint64_t joinEUI,
+                const uint64_t devEUI,
+                uint8_t appKey[16],
+                uint8_t nwkKey[16],
+                uint8_t pin1,
+                uint8_t pin2,
+                uint8_t pin3,
+                uint8_t pin4,
+                const uint8_t subBand = 0);
+
+        void goToSleep();
+
+        void setup(uint16_t bootCount);
+
+        void setUplinkPayload(uint8_t fPort, const std::string& uplinkPayload);
+        void setDownlinkCB(std::function<void(uint8_t, uint8_t*, std::size_t)> downlinkCB);
+
+        void loop();
+
+    private:
+        int16_t activate(uint16_t bootCount);
+
+        std::function<void(uint8_t fPort, uint8_t*, std::size_t)> downlinkCB;
+
+        LoRaModule radio;
+        LoRaWANNode node;
+
+        uint8_t fPort = 221;
+        std::string uplinkPayload;
+    };
+
+} // namespace GAIT
+
+#endif // LORAWAN_H`}
+            </code>
+          </pre>
+          <br />
+          <pre className="bg-[#262626] text-white p-4 rounded">
+            <code className="language-cpp">{`#include "LoRaWAN.h"
+
+// ##### load the ESP32 preferences facilites
+#include <Preferences.h>
+
+void gotoSleep(uint32_t seconds);
+
+namespace SmartAirControl {
+
+    static void debug(bool isFail, const __FlashStringHelper* message, int state, bool Freeze);
+    static void arrayDump(uint8_t* buffer, uint16_t len);
+
+    uint16_t bootCountSinceUnsuccessfulJoin = 0;
+    uint8_t session[RADIOLIB_LORAWAN_SESSION_BUF_SIZE];
+
+    template <typename LoRaModule>
+    LoRaWAN<LoRaModule>::LoRaWAN(const LoRaWANBand_t& region,
+                                 const uint64_t joinEUI,
+                                 const uint64_t devEUI,
+                                 uint8_t appKey[16],
+                                 uint8_t nwkKey[16],
+                                 uint8_t pin1,
+                                 uint8_t pin2,
+                                 uint8_t pin3,
+                                 uint8_t pin4,
+                                 const uint8_t subBand)
+        : radio(new Module(pin1, pin2, pin3, pin4))
+        , node(&radio, &region, subBand) {
+        node.beginOTAA(joinEUI, devEUI, nwkKey, appKey);
+    }
+
+    template <typename LoRaModule>
+    void LoRaWAN<LoRaModule>::goToSleep() {
+        Serial.print(F("[LoRaWAN] Set sleep: "));
+
+        int16_t result = radio.sleep();
+
+        Serial.println(result == 0 ? F("SUCCESS") : F("ERROR"));
+    }
+
+    template <typename LoRaModule>
+    int16_t LoRaWAN<LoRaModule>::activate(uint16_t bootCount) {
+        int16_t state = RADIOLIB_ERR_UNKNOWN;
+
+        Serial.println(F("Recalling LoRaWAN nonces & session"));
+
+        // ##### setup the flash storage
+        Preferences store;
+        store.begin("radiolib");
+
+        LoRaWANJoinEvent_t joinEvent;
+
+        // ##### if we have previously saved nonces, restore them and try to restore
+        // session as well
+        if (store.isKey("nonces")) {
+            uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE]; // create somewhere to
+                                                              // store nonces
+            store.getBytes("nonces", buffer,
+                           RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // get them from the store
+            state = node.setBufferNonces(buffer);             // send them to LoRaWAN
+            debug(state != RADIOLIB_ERR_NONE, F("Restoring nonces buffer failed"), state, false);
+
+            // recall session from RTC deep-sleep preserved variable
+            state = node.setBufferSession(session); // send them to LoRaWAN stack
+
+            // if we have booted more than once we should have a session to restore, so
+            // report any failure otherwise no point saying there's been a failure when
+            // it was bound to fail with an empty LWsession var.
+            debug((state != RADIOLIB_ERR_NONE) && (bootCount > 1), F("Restoring session buffer failed"), state, false);
+
+            // if Nonces and Session restored successfully, activation is just a
+            // formality moreover, Nonces didn't change so no need to re-save them
+            if (state == RADIOLIB_ERR_NONE) {
+                Serial.println(F("Succesfully restored session - now activating"));
+                state = node.activateOTAA(RADIOLIB_LORAWAN_DATA_RATE_UNUSED, &joinEvent);
+                debug((state != RADIOLIB_LORAWAN_SESSION_RESTORED), F("Failed to activate restored session"), state, true);
+
+                // ##### close the store before returning
+                store.end();
+
+                return (state);
+            }
+        } else { // store has no key "nonces"
+            Serial.println(F("No Nonces saved - starting fresh."));
+        }
+
+        // if we got here, there was no session to restore, so start trying to join
+        state = RADIOLIB_ERR_NETWORK_NOT_JOINED;
+        while (state != RADIOLIB_LORAWAN_NEW_SESSION) { // Original code
+            Serial.println(F("Join ('login') to the LoRaWAN Network"));
+            state = node.activateOTAA(RADIOLIB_LORAWAN_DATA_RATE_UNUSED, &joinEvent);
+
+            // ##### save the join counters (nonces) to permanent store
+            Serial.println(F("Saving nonces to flash"));
+            uint8_t buffer[RADIOLIB_LORAWAN_NONCES_BUF_SIZE]; // create somewhere to
+                                                              // store nonces
+            const uint8_t* persist = node.getBufferNonces();  // get pointer to nonces
+            memcpy(buffer, persist,
+                   RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // copy in to buffer
+            store.putBytes("nonces", buffer,
+                           RADIOLIB_LORAWAN_NONCES_BUF_SIZE); // send them to the store
+
+            // we'll save the session after an uplink
+
+            if (state != RADIOLIB_LORAWAN_NEW_SESSION) {
+                Serial.print(F("Join failed: "));
+                Serial.println(state);
+
+                // how long to wait before join attempts. This is an interim solution
+                // pending implementation of TS001 LoRaWAN Specification section #7 - this
+                // doc applies to v1.0.4 & v1.1 it sleeps for longer & longer durations to
+                // give time for any gateway issues to resolve or whatever is interfering
+                // with the device <-> gateway airwaves.
+                uint32_t sleepForSeconds = 15;
+                Serial.print(F("Boots since unsuccessful join: "));
+                Serial.println(bootCountSinceUnsuccessfulJoin);
+                Serial.print(F("Retrying join in "));
+                Serial.print(sleepForSeconds);
+                Serial.println(F(" seconds"));
+
+                gotoSleep(sleepForSeconds);
+            }
+        } // while join
+
+        Serial.println(F("Joined"));
+        Serial.print(F("JoinNonce: "));
+        Serial.println(joinEvent.joinNonce);
+        Serial.print(F("DevNonce: "));
+        Serial.println(joinEvent.devNonce);
+        Serial.print(F("NewSession: "));
+        Serial.println(joinEvent.newSession);
+
+        // reset the failed join count
+        bootCountSinceUnsuccessfulJoin = 0;
+
+        delay(1000); // hold off off hitting the airwaves again too soon - an issue in
+                     // the US
+
+        // ##### close the store
+        store.end();
+
+        return (state);
+    }
+
+    template <typename LoRaModule>
+    void LoRaWAN<LoRaModule>::setDownlinkCB(std::function<void(uint8_t, uint8_t*, std::size_t)> downlinkCB) {
+        this->downlinkCB = downlinkCB;
+    }
+
+    template <typename LoRaModule>
+    void LoRaWAN<LoRaModule>::setup(uint16_t bootCount) {
+        Serial.println(F("Initalise the radio"));
+
+        int16_t state = radio.begin();
+        debug(state != RADIOLIB_ERR_NONE, F("Initalise radio failed"), state, true);
+
+        if (state == RADIOLIB_ERR_NONE) {
+            // activate node by restoring session or otherwise joining the network
+            state = activate(bootCount);
+
+            if (state != RADIOLIB_LORAWAN_NEW_SESSION && state != RADIOLIB_LORAWAN_SESSION_RESTORED) {
+                Serial.println(F("LoRaWAN not activated"));
+
+                // now save session to RTC memory
+                const uint8_t* persist = node.getBufferSession();
+                memcpy(session, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
+
+                // wait until next uplink - observing legal & TTN FUP constraints
+                gotoSleep(RADIOLIB_LORA_UPLINK_INTERVAL_SECONDS);
+            }
+        }
+    }
+
+    template <typename LoRaModule>
+    void LoRaWAN<LoRaModule>::setUplinkPayload(uint8_t fPort, const std::string& uplinkPayload) {
+        this->fPort = fPort;
+        this->uplinkPayload = uplinkPayload;
+    }
+
+    template <typename LoRaModule>
+    void LoRaWAN<LoRaModule>::loop() {
+        // create downlinkPayload byte array
+        uint8_t downlinkPayload[255]; // Make sure this fits your plans!
+        size_t downlinkSize;          // To hold the actual payload size received
+
+        // you can also retrieve additional information about an uplink or
+        // downlink by passing a reference to LoRaWANEvent_t structure
+        static LoRaWANEvent_t uplinkDetails{};
+        static LoRaWANEvent_t downlinkDetails{};
+
+        int16_t state = 0;
+        if (downlinkDetails.frmPending || downlinkDetails.confirmed) { // At first run this is false due to initialization
+            Serial.println(F("[LoRaWAN] Sending request for pending frame"));
+            state = node.sendReceive(reinterpret_cast<const uint8_t*>(""), // cppcheck-suppress cstyleCast
+                                     0,
+                                     220,
+                                     downlinkPayload,
+                                     &downlinkSize,
+                                     false,
+                                     &uplinkDetails,
+                                     &downlinkDetails);
+        } else {
+            Serial.print(F("[LoRaWAN] Sending: "));
+            Serial.print(F("fPort = "));
+            Serial.print(fPort);
+            Serial.print(", ");
+            Serial.println(uplinkPayload.c_str());
+
+            if (node.getFCntUp() == 1) {
+                Serial.println(F("[LoRaWAN]   and requesting LinkCheck and DeviceTime"));
+
+                node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_LINK_CHECK);
+                node.sendMacCommandReq(RADIOLIB_LORAWAN_MAC_DEVICE_TIME);
+            }
+
+            state = node.sendReceive(reinterpret_cast<const uint8_t*>(uplinkPayload.c_str()), // cppcheck-suppress cstyleCast
+                                     uplinkPayload.length(),
+                                     fPort,
+                                     downlinkPayload,
+                                     &downlinkSize,
+                                     false,
+                                     &uplinkDetails,
+                                     &downlinkDetails);
+        }
+
+        debug((state < RADIOLIB_ERR_NONE), F("Error in sendReceive"), state, false); // This is correct
+
+        if (state > 0) {
+            Serial.println(F("[LoRaWAN] Downlink received"));
+
+            if (downlinkSize > 0) {
+                Serial.print(F("[LoRaWAN] Payload:\t"));
+                arrayDump(downlinkPayload, downlinkSize);
+                if (downlinkCB) {
+                    downlinkCB(downlinkDetails.fPort, downlinkPayload, downlinkSize);
+                }
+            } else {
+                Serial.println(F("[LoRaWAN] <MAC commands only>"));
+            }
+
+            Serial.println(F("[LoRaWan] Signal:"));
+            Serial.print(F("[LoRaWAN]     RSSI:               "));
+            Serial.print(radio.getRSSI());
+            Serial.println(F(" dBm"));
+
+            // print SNR (Signal-to-Noise Ratio)
+            Serial.print(F("[LoRaWAN]     SNR:                "));
+            Serial.print(radio.getSNR());
+            Serial.println(F(" dB"));
+
+            // print extra information about the event
+            Serial.println(F("[LoRaWAN] Event information:"));
+            Serial.print(F("[LoRaWAN]     Confirmed:          "));
+            Serial.println(downlinkDetails.confirmed);
+            Serial.print(F("[LoRaWAN]     Confirming:         "));
+            Serial.println(downlinkDetails.confirming);
+            Serial.print(F("[LoRaWAN]     FrmPending:         "));
+            Serial.println(downlinkDetails.frmPending);
+            Serial.print(F("[LoRaWAN]     Datarate:           "));
+            Serial.println(downlinkDetails.datarate);
+            Serial.print(F("[LoRaWAN]     Frequency:          "));
+            Serial.print(downlinkDetails.freq, 3);
+            Serial.println(F(" MHz"));
+            Serial.print(F("[LoRaWAN]     Frame count:        "));
+            Serial.println(downlinkDetails.fCnt);
+            Serial.print(F("[LoRaWAN]     Port:               "));
+            Serial.println(downlinkDetails.fPort);
+            Serial.print(F("[LoRaWAN]     Time-on-air:        "));
+            Serial.print(node.getLastToA());
+            Serial.println(F(" ms"));
+            Serial.print(F("[LoRaWAN]     Rx window:          "));
+            Serial.println(state);
+
+            uint8_t margin = 0;
+            uint8_t gwCnt = 0;
+            if (node.getMacLinkCheckAns(&margin, &gwCnt) == RADIOLIB_ERR_NONE) {
+                Serial.println(F("[LoRaWAN] Link check:"));
+                Serial.print(F("[LoRaWAN]     LinkCheck margin:   "));
+                Serial.println(margin);
+                Serial.print(F("[LoRaWAN]     LinkCheck count:    "));
+                Serial.println(gwCnt);
+            }
+
+            uint32_t networkTime = 0;
+            uint8_t fracSecond = 0;
+            if (node.getMacDeviceTimeAns(&networkTime, &fracSecond, true) == RADIOLIB_ERR_NONE) {
+                Serial.println(F("[LoRaWAN] Timing:"));
+                Serial.print(F("[LoRaWAN]     DeviceTime Unix:    "));
+                Serial.println(networkTime);
+                Serial.print(F("[LoRaWAN]     DeviceTime second:  1/"));
+                Serial.println(fracSecond);
+            }
+        } else {
+            Serial.println(F("[LoRaWAN] No downlink received"));
+        }
+
+        if (state <= 0 || !(downlinkDetails.frmPending || downlinkDetails.confirmed)) {
+            // now save session to RTC memory
+            const uint8_t* persist = node.getBufferSession();
+            memcpy(session, persist, RADIOLIB_LORAWAN_SESSION_BUF_SIZE);
+
+            // wait until next uplink - observing legal & TTN FUP constraints
+            gotoSleep(RADIOLIB_LORA_UPLINK_INTERVAL_SECONDS);
+        }
+    }
+
+    // Helper function to display any issues
+    static void debug(bool isFail, const __FlashStringHelper* message, int state, bool Freeze) {
+        if (isFail) {
+            Serial.print(message);
+            Serial.print("(");
+            Serial.print(state);
+            Serial.println(")");
+            while (Freeze)
+                ;
+        }
+    }
+
+    // Helper function to display a byte array
+    static void arrayDump(uint8_t* buffer, uint16_t len) {
+        for (uint16_t c = 0; c < len; c++) {
+            Serial.printf("0x%02X ", buffer[c]);
+        }
+        Serial.print("-> ");
+
+        char str[len + 1];
+        str[len] = '\0';
+
+        snprintf(str, len + 1, "%s", buffer);
+        Serial.println(str);
+    }
+
+} // namespace SmartAirControl`}</code>
+          </pre>
+          <br />
+        <h4 className="text-lg font-semibold mt-6 mb-2">The Things Network Configuration</h4>
+        <p> 
+          To connect to The Things Network, you need to create an application and a device in the TTN console.
+          Once the device is created, you need to copy the JoinEUI, DevEUI, AppKey, and NwkKey from the TTN console and paste them into the your platform.ini file.
+          The following code is an example of the platform.ini file:
+        </p>
+        <pre className="bg-[#262626] text-white p-4 rounded">
+          <code className="language-ini">{`; PlatformIO Project Configuration File
+;
+;   Build options: build flags, source filter
+;   Upload options: custom upload port, speed and extra flags
+;   Library options: dependencies, extra library storages
+;   Advanced options: extra scripting
+;
+; Please visit documentation for the other options and examples
+; https://docs.platformio.org/page/projectconf.html
+
+[platformio]
+default_envs = 
+	ttn_sandbox_lorawan_sx1262-v11-a-01
+
+[radiolib]
+lib_deps = https://github.com/PCo-IoT-2024/RadioLib.git
+
+[gps]
+build_flags = 
+	-D GPS_SERIAL_PORT=2
+	-D GPS_SERIAL_BAUD_RATE=9600
+	-D GPS_SERIAL_CONFIG=SERIAL_8N1
+	-D GPS_SERIAL_RX_PIN=16
+	-D GPS_SERIAL_TX_PIN=17
+lib_deps = mikalhart/TinyGPSPlus
+
+[eu868]
+build_flags = 
+	-D RADIOLIB_LORA_REGION=EU868
+	-D RADIOLIB_LORA_SUBBANDS=0
+
+[sx1262-v11-a-01]
+build_flags = 
+	-D RADIOLIB_LORAWAN_DEV_EUI="Your DevEUI here"
+	-D RADIOLIB_LORAWAN_APP_KEY="Your AppKey here"
+	-D RADIOLIB_LORAWAN_NWK_KEY="Your NwkKey here"
+
+[message_104]
+build_flags = 
+	-D RADIOLIB_LORAWAN_PAYLOAD="\\"RadioLib v1.0.4 device: Waiting for GPS\\""
+
+[message_110]
+build_flags = 
+	-D RADIOLIB_LORAWAN_PAYLOAD="\\"RadioLib v1.1.0 device: Waiting for GPS\\""
+
+[message_experiment_110]
+build_flags = 
+	-D RADIOLIB_LORAWAN_PAYLOAD="\\"RadioLib v1.1.0 experiment device: Waiting for GPS\\""
+
+[sx1262]
+build_flags = 
+	-D RADIOLIB_LORA_MODULE=SX1262
+	-D RADIOLIB_EXCLUDE_CC1101
+	-D RADIOLIB_EXCLUDE_LR11X0
+	-D RADIOLIB_EXCLUDE_RF69
+	-D RADIOLIB_EXCLUDE_RFM2X
+	-D RADIOLIB_EXCLUDE_SX1231
+	-D RADIOLIB_EXCLUDE_SX127X
+	-D RADIOLIB_EXCLUDE_SX128X
+	-D RADIOLIB_EXCLUDE_SI443X
+	-D RADIOLIB_EXCLUDE_NRF24
+
+[sx1262_radiolib_esp32dev]
+lib_deps = 
+	\${radiolib.lib_deps}
+build_flags = 
+	\${sx1262.build_flags}
+	-D RADIOLIB_LORA_MODULE_BITMAP="5, 2, 14, 4"
+
+[ttn_sandbox]
+build_flags = 
+	-D RADIOLIB_LORAWAN_JOIN_EUI="0x0000000000000000"
+
+[ttn_sandbox_lorawan]
+build_flags = 
+	\${ttn_sandbox.build_flags}
+	-D RADIOLIB_EXCLUDE_AFSK
+	-D RADIOLIB_EXCLUDE_APRS
+	-D RADIOLIB_EXCLUDE_AX25
+	-D RADIOLIB_EXCLUDE_BELL
+	-D RADIOLIB_EXCLUDE_FSK4
+	-D RADIOLIB_EXCLUDE_HELLSCHREIBER
+	-D RADIOLIB_EXCLUDE_MORSE
+	-D RADIOLIB_EXCLUDE_PAGER
+	-D RADIOLIB_EXCLUDE_RTTY
+	-D RADIOLIB_EXCLUDE_SSTV
+
+[ttn_sandbox_lorawan_sx1262_radiolib_esp32]
+lib_deps = 
+	\${sx1262_radiolib_esp32dev.lib_deps}
+build_flags = 
+	\${ttn_sandbox_lorawan.build_flags}
+	\${sx1262_radiolib_esp32dev.build_flags}
+
+[env:ttn_sandbox_lorawan_sx1262-v11-a-01]
+platform = espressif32
+board = esp32dev
+framework = arduino
+monitor_speed = 115200
+lib_deps = 
+	\${ttn_sandbox_lorawan_sx1262_radiolib_esp32.lib_deps}
+	\${gps.lib_deps}
+	mikalhart/TinyGPSPlus@^1.1.0
+	adafruit/Adafruit Unified Sensor@^1.1.15
+	adafruit/Adafruit BME680 Library@^2.0.5
+	bblanchon/ArduinoJson@^7.4.1
+	adafruit/Adafruit PM25 AQI Sensor@^1.2.0
+build_flags = 
+	\${eu868.build_flags}
+	\${ttn_sandbox_lorawan_sx1262_radiolib_esp32.build_flags}
+	\${sx1262-v11-a-01.build_flags}
+	\${message_experiment_110.build_flags}
+	\${gps.build_flags}
+	-D RADIOLIB_LORA_UPLINK_INTERVAL_SECONDS="(1UL * 10UL)"
+	-D USE_LORAWAN=1
+`}</code>
+        </pre>
+        <br />
+        <p>
+          To parse the uplink payload that is received from the device, you have you define a custom payload formatter in the TTN console.
+          The following code is an example of a custom payload formatter that parses the uplink payload and returns a JSON object:
+        </p>
+        <pre className="bg-[#262626] text-white p-4 rounded">
+          <code className="language-javascript">{`function decodeUplink(input) {
+  const load = JSON.parse(String.fromCharCode.apply(null, input.bytes));
+  
+  const payload = {
+    data: {},
+    warnings: [],
+    errors: []
+  };
+  
+  switch(input.fPort){
+    case 2: 
+      payload.data = load;
+      break;
+  }
+  
+  return payload;
+}`}</code>
+        </pre>
+        <br />
+        <p>
+          Now everything is set up. We can now use all the modules in the main file to use all the data from the sensors to calculate the air quality and send it to The Things Network.
+          We will also generate a score based on the air quality and use it to control the fan speed.
+          The following code is an example of the main file that uses all the modules and sends the data to The Things Network:
+        </p>
+        <pre className="bg-[#262626] text-white p-4 rounded">
+          <code className="language-cpp">{`#if !defined(ESP32)
+#pragma error("This is not the example your device is looking for - ESP32 only")
+#endif
+
+#include <Preferences.h>
+
+#if USE_LORAWAN == 1
+RTC_DATA_ATTR uint16_t bootCount = 0;
+#include "LoRa/LoRAWAN.hpp"
+#include <ArduinoJson.h>
+#endif
+#include "BME/BME.h"
+#include "PMS/PMS.h"
+#include "Fan/Fan.h"
+
+#if USE_LORAWAN == 1
+static SmartAirControl::LoRaWAN<RADIOLIB_LORA_MODULE> loRaWAN(RADIOLIB_LORA_REGION,
+                                                   RADIOLIB_LORAWAN_JOIN_EUI,
+                                                   RADIOLIB_LORAWAN_DEV_EUI,
+                                                   (uint8_t[16]) {RADIOLIB_LORAWAN_APP_KEY},
+#ifdef RADIOLIB_LORAWAN_NWK_KEY
+                                                   (uint8_t[16]) {RADIOLIB_LORAWAN_NWK_KEY},
+#else
+                                                   nullptr,
+#endif
+                                                   RADIOLIB_LORA_MODULE_BITMAP);
+
+#endif
+
+static SmartAirControl::BME bme(BME680_OS_8X, 
+                    BME680_OS_2X, 
+                    BME680_OS_4X,
+                    BME680_FILTER_SIZE_3, 
+                    320, 150,
+                    1013.25);
+static SmartAirControl::PMS pms(16, 17, 9600, SERIAL_8N1);
+static SmartAirControl::Fan fan(13, 12);
+
+#if USE_LORAWAN == 1
+
+uint32_t sleepTime = 0;
+
+void gotoSleep(uint32_t seconds) {
+    loRaWAN.goToSleep();
+    sleepTime = seconds * 1000;
+
+    Serial.println("[LoRaWAN] Go to sleep");
+    Serial.println();
+}
+#endif
+
+class Data {
+    public:
+        Data(PM25_AQI_Data pmsData, SmartAirControl::BMEData bmeData, int FanRpm, float FanPercent) : pmsData(pmsData), bmeData(bmeData), FanRpm(FanRpm), FanPercent(FanPercent) {}
+        PM25_AQI_Data pmsData;
+        SmartAirControl::BMEData bmeData;
+        int FanRpm;
+        float FanPercent;
+};
+
+Data readSensors() {
+    PM25_AQI_Data pmsData = pms.read();
+    SmartAirControl::BMEData bmeData = bme.read();
+    int FanRpm = fan.getRpm();
+    float FanPercent = fan.getRpmPercent();
+    return Data(pmsData, bmeData, FanRpm, FanPercent);
+}
+
+float adjustFanSpeed(Data data) {
+    float gas = data.bmeData.gasResistance;
+    float pm1 = data.pmsData.particles_10um;
+    float pm25 = data.pmsData.particles_25um;
+    float pm10 = data.pmsData.particles_100um;
+    float temp = data.bmeData.temperature;
+
+    // Normalize sensor values (example thresholds, adjust as needed)
+    float gasScore = gas < 10000 ? 1.0 : (gas < 20000 ? 0.5 : 0.0); // lower gas resistance = worse air
+    float pmScore = (pm1 + pm25 + pm10) / 3.0;
+    float pmNorm = pmScore < 10 ? 0.0 : (pmScore < 35 ? 0.5 : 1.0); // higher PM = worse air
+    float tempScore = temp > 30 ? 1.0 : (temp > 25 ? 0.5 : 0.0); // higher temp = higher speed
+
+    // Weighted sum (tune weights as needed)
+    float score = 0.2 * gasScore + 0.7 * pmNorm + 0.1 * tempScore;
+
+    float fanPercent = score * 100;
+
+    fan.setRpmPercent(fanPercent);
+
+    Serial.print(F("[APP] Adjusting fan speed to "));
+    Serial.print(fanPercent);
+    Serial.println(F("% based on air quality and temperature."));
+
+    return 1 - score;
+}
+
+void setup() {
+    Serial.begin(115200);
+    while (!Serial)
+        ;        // wait for serial to be initalised
+    delay(2000); // give time to switch to the serial monitor
+    
+    Serial.println(F("Setup"));
+
+    #if USE_LORAWAN == 1
+    loRaWAN.setup(bootCount);
+
+    delay(1000); // give time to switch to the serial monitor
+
+    loRaWAN.setDownlinkCB([](uint8_t fPort, uint8_t* downlinkPayload, std::size_t downlinkSize) {
+            Serial.print(F("[APP] Payload: fPort="));
+            Serial.print(fPort);
+            Serial.print(", ");
+            SmartAirControl::arrayDump(downlinkPayload, downlinkSize);
+    });
+    #endif
+    
+    bme.setup();
+    pms.setup();
+    fan.setup();
+
+    delay(5000); // wait for sensors to warm up
+}
+
+void loop() {
+
+    #if USE_LORAWAN == 1
+    Serial.println(F("[APP] Aquire data and construct LoRaWAN uplink"));
+    
+    std::string uplinkPayload = RADIOLIB_LORAWAN_PAYLOAD;
+    uint8_t fPort = 2;
+    
+    Data sensorData = readSensors();
+    delay(1000); // wait for sensors to stabilize
+    float score = adjustFanSpeed(sensorData);
+    
+    // Create a JSON object
+    JsonDocument doc;
+    doc["t"] = sensorData.bmeData.temperature;
+    doc["p"] = sensorData.bmeData.pressure;
+    doc["h"] = sensorData.bmeData.humidity;
+    doc["g"] = sensorData.bmeData.gasResistance;
+    /*doc["p03"] = sensorData.pmsData.particles_03um;
+    doc["p05"] = sensorData.pmsData.particles_05um;
+    doc["p10"] = sensorData.pmsData.particles_10um;
+    doc["p25"] = sensorData.pmsData.particles_25um;
+    doc["p50"] = sensorData.pmsData.particles_50um;
+    doc["p100"] = sensorData.pmsData.particles_100um; */
+    doc["rpm"] = sensorData.FanRpm;
+    doc["s"] = score;
+    
+    
+    // Serialize to string
+    String jsonString;
+    serializeJson(doc, jsonString);
+    
+    // Assign to uplink payload
+    uplinkPayload = std::string(jsonString.c_str());
+
+    // Prit the size of the payload in bytes
+    Serial.print(F("[APP] Payload size: "));
+    Serial.print(uplinkPayload.length());
+    
+    loRaWAN.setUplinkPayload(fPort, uplinkPayload);
+
+    loRaWAN.loop();
+    #else
+    Data data = readSensors();
+    adjustFanSpeed(data);
+    delay(10000);
+    #endif
+}`}</code>
+        </pre>
+        <br />
+        <p>
+          This code reads the data from the sensors, calculates the air quality score, adjusts the fan speed, and sends the data to The Things Network.
+        </p>
+        <img src="./ImagesLeon/Final_Setup_Steckbrett.jpg" alt="Breadboard Setup" className="w-150 h-auto justify-center mx-auto mb-4" />
         </section>
 
         {/* Display Step */}
